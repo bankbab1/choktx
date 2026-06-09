@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6366f1" />
+  <title>Dashboard · Expense Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Dashboard</h1>
+      <button class="icon-btn" onclick="Theme.toggle(); location.reload();" aria-label="Toggle theme">🌓</button>
+    </header>
+
+    <main class="app-content">
+      <div class="period-tabs">
+        <button class="period-btn" data-period="day">Day</button>
+        <button class="period-btn" data-period="week">Week</button>
+        <button class="period-btn active" data-period="month">Month</button>
+        <button class="period-btn" data-period="year">Year</button>
+      </div>
+
+      <div class="summary">
+        <div class="summary-label" id="period-label">This Month</div>
+        <div class="summary-amount" id="total-amount">0.00</div>
+        <div class="summary-count" id="total-count">0 entries</div>
+      </div>
+
+      <div class="card">
+        <div class="chart-wrap">
+          <canvas id="category-chart"></canvas>
+        </div>
+        <div id="breakdown"></div>
+        <div class="empty" id="empty" style="display:none">
+          <div class="empty-icon">📊</div>
+          <div>No expenses yet. Tap + to add one.</div>
+        </div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
+        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
+        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
+        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
+      </div>
+    </nav>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

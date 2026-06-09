@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Add Expense · Expense Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Add Expense</h1>
+      <a href="index.html" class="icon-btn" aria-label="Close">✕</a>
+    </header>
+
+    <main class="app-content">
+      <form id="expense-form" class="card">
+        <div class="field">
+          <label for="cost">Amount</label>
+          <input id="cost" class="cost-input" type="number" step="0.01" min="0" placeholder="0.00" required />
+        </div>
+
+        <div class="field">
+          <label for="date">Date</label>
+          <input id="date" type="date" required />
+        </div>
+
+        <div class="field">
+          <label for="category">Category</label>
+          <select id="category" required></select>
+        </div>
+
+        <div class="field" id="sub-wrap" style="display:none">
+          <label for="subcategory">Subcategory</label>
+          <select id="subcategory"></select>
+        </div>
+
+        <div class="field">
+          <label for="description">Description</label>
+          <input id="description" type="text" placeholder="What was it for?" maxlength="100" />
+        </div>
+
+        <button class="btn" type="submit">Save Expense</button>
+      </form>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
+        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
+        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
+        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast">Saved</div>
+
+  <script src="js/categories.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/add.js"></script>
+</body>
+</html>
