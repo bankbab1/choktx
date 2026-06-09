@@ -7,8 +7,11 @@
   const descEl = document.getElementById("description");
   const costEl = document.getElementById("cost");
   const toast = document.getElementById("toast");
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const titleEl = document.getElementById("page-title");
 
-  dateEl.value = new Date().toISOString().slice(0, 10);
+  const editId = new URLSearchParams(location.search).get("edit");
+  const existing = editId ? Store.get(editId) : null;
 
   CATEGORY_NAMES.forEach(n => {
     const o = document.createElement("option");
@@ -16,7 +19,7 @@
     catEl.appendChild(o);
   });
 
-  function renderSub() {
+  function renderSub(preselect) {
     const subs = CATEGORIES[catEl.value]?.sub || [];
     subEl.innerHTML = '<option value="">— none —</option>';
     if (subs.length === 0) { subWrap.style.display = "none"; return; }
@@ -24,11 +27,24 @@
     subs.forEach(s => {
       const o = document.createElement("option");
       o.value = s; o.textContent = s;
+      if (preselect && s === preselect) o.selected = true;
       subEl.appendChild(o);
     });
   }
-  catEl.addEventListener("change", renderSub);
-  renderSub();
+  catEl.addEventListener("change", () => renderSub());
+
+  if (existing) {
+    titleEl.textContent = "Edit Expense";
+    submitBtn.textContent = "Update Expense";
+    dateEl.value = existing.date;
+    catEl.value = existing.category;
+    renderSub(existing.subcategory);
+    descEl.value = existing.description || "";
+    costEl.value = existing.cost;
+  } else {
+    dateEl.value = new Date().toISOString().slice(0, 10);
+    renderSub();
+  }
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -49,9 +65,13 @@
       showToast("Please enter a valid amount");
       return;
     }
-    Store.add(rec);
-    showToast("Expense saved");
-    // Return to dashboard so the user immediately sees the updated totals
+    if (existing) {
+      Store.update(existing.id, rec);
+      showToast("Expense updated");
+    } else {
+      Store.add(rec);
+      showToast("Expense saved");
+    }
     setTimeout(() => { window.location.href = "index.html"; }, 700);
   });
 })();

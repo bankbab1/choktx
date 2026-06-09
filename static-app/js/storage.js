@@ -10,12 +10,21 @@
 
   window.Store = {
     all() { return read().sort((a, b) => b.date.localeCompare(a.date)); },
+    get(id) { return read().find(r => r.id === id) || null; },
     add(rec) {
       const list = read();
       rec.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
       list.push(rec);
       write(list);
       return rec;
+    },
+    update(id, patch) {
+      const list = read();
+      const i = list.findIndex(r => r.id === id);
+      if (i === -1) return null;
+      list[i] = { ...list[i], ...patch, id };
+      write(list);
+      return list[i];
     },
     remove(id) { write(read().filter(r => r.id !== id)); },
     clear() { localStorage.removeItem(KEY); },
