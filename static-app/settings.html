@@ -15,30 +15,31 @@
 
     <main class="app-content">
       <div class="card">
+        <div class="section-title">Appearance</div>
         <div class="setting-row">
           <div>
             <div class="setting-row-label">Dark mode</div>
-            <div class="setting-row-desc">Switch between light & dark theme</div>
+            <div class="setting-row-desc">Switch between light and dark theme</div>
           </div>
-          <button class="btn btn-ghost" style="width:auto;padding:8px 16px" onclick="Theme.toggle();location.reload();">Toggle</button>
+          <button class="btn-sm setting-row-action" onclick="Theme.toggle();location.reload();">Toggle</button>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="margin:0 0 10px;font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Data</h3>
+        <div class="section-title">Data</div>
         <div class="setting-row">
           <div>
             <div class="setting-row-label">Export</div>
             <div class="setting-row-desc">Download all records as JSON</div>
           </div>
-          <button class="btn btn-ghost" style="width:auto;padding:8px 16px" onclick="exportData()">Export</button>
+          <button class="btn-sm setting-row-action" onclick="exportData()">Export</button>
         </div>
         <div class="setting-row">
           <div>
             <div class="setting-row-label">Import</div>
             <div class="setting-row-desc">Replace data from JSON file</div>
           </div>
-          <label class="btn btn-ghost" style="width:auto;padding:8px 16px;cursor:pointer;margin:0">
+          <label class="btn-sm setting-row-action" style="cursor:pointer">
             Import
             <input type="file" accept="application/json" style="display:none" onchange="importData(event)" />
           </label>
@@ -48,12 +49,12 @@
             <div class="setting-row-label">Clear all data</div>
             <div class="setting-row-desc">Delete every record permanently</div>
           </div>
-          <button class="btn btn-danger" style="width:auto;padding:8px 16px" onclick="clearAll()">Clear</button>
+          <button class="btn-sm danger setting-row-action" onclick="clearAll()">Clear</button>
         </div>
       </div>
 
       <div class="card">
-        <h3 style="margin:0 0 10px;font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Categories</h3>
+        <div class="section-title">Categories</div>
         <div id="cat-list"></div>
       </div>
 
@@ -62,30 +63,25 @@
       </div>
     </main>
 
-    <nav class="bottom-nav">
-      <div class="bottom-nav-inner">
-        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
-        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
-        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
-        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
-        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
-      </div>
-    </nav>
+    <div id="bottom-nav-slot" data-active="settings"></div>
   </div>
 
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="js/categories.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/nav.js"></script>
   <script>
-    // Render category list
     const catList = document.getElementById("cat-list");
     CATEGORY_NAMES.forEach(n => {
       const meta = CATEGORIES[n];
       const div = document.createElement("div");
       div.className = "cat-info";
       div.innerHTML = `
-        <div class="cat-info-name" style="color:${meta.color}">${meta.icon} ${n}</div>
-        <div class="cat-info-subs">${meta.sub.length ? meta.sub.join(" · ") : "No subcategories"}</div>`;
+        <div class="cat-icon" style="background:${meta.color}1a;color:${meta.color}"><i data-lucide="${meta.icon}"></i></div>
+        <div class="cat-info-body">
+          <div class="cat-info-name">${n}</div>
+          <div class="cat-info-subs">${meta.sub.length ? meta.sub.join(" · ") : "No subcategories"}</div>
+        </div>`;
       catList.appendChild(div);
     });
 
@@ -114,6 +110,7 @@
         alert("All data cleared");
       }
     }
+    setTimeout(() => window.refreshIcons && window.refreshIcons(), 0);
   </script>
 </body>
 </html>

@@ -4,10 +4,9 @@
   const filterCat = document.getElementById("filter-cat");
   const filterPeriod = document.getElementById("filter-period");
 
-  // populate filter
   CATEGORY_NAMES.forEach(n => {
     const o = document.createElement("option");
-    o.value = n; o.textContent = `${CATEGORIES[n].icon} ${n}`;
+    o.value = n; o.textContent = n;
     filterCat.appendChild(o);
   });
 
@@ -31,7 +30,6 @@
     listEl.innerHTML = "";
     emptyEl.style.display = rows.length ? "none" : "block";
 
-    // group by date
     const groups = {};
     rows.forEach(r => { (groups[r.date] = groups[r.date] || []).push(r); });
     Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(date => {
@@ -42,23 +40,25 @@
       listEl.appendChild(head);
 
       groups[date].forEach(r => {
-        const meta = CATEGORIES[r.category] || { color: "#888", icon: "•" };
+        const meta = CATEGORIES[r.category] || { color: "#888", icon: "circle" };
         const item = document.createElement("div");
         item.className = "record";
         item.innerHTML = `
-          <div class="record-icon" style="background:${meta.color}22;color:${meta.color}">${meta.icon}</div>
+          <div class="record-icon" style="background:${meta.color}1a;color:${meta.color}"><i data-lucide="${meta.icon}"></i></div>
           <div class="record-body">
             <div class="record-title">${r.description || r.category}</div>
             <div class="record-sub">${r.category}${r.subcategory ? " · " + r.subcategory : ""}</div>
           </div>
           <div class="record-amt">${fmt(r.cost)}</div>
-          <button class="record-del" aria-label="Delete">×</button>`;
+          <button class="record-del" aria-label="Delete"><i data-lucide="trash-2"></i></button>`;
         item.querySelector(".record-del").addEventListener("click", () => {
           if (confirm("Delete this entry?")) { Store.remove(r.id); render(); }
         });
         listEl.appendChild(item);
       });
     });
+
+    window.refreshIcons && window.refreshIcons();
   }
 
   filterCat.addEventListener("change", render);
