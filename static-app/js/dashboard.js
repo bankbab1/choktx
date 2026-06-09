@@ -6,8 +6,10 @@
   const breakdownEl = document.getElementById("breakdown");
   const emptyEl = document.getElementById("empty");
   const chartCanvas = document.getElementById("category-chart");
+  const recentEl = document.getElementById("recent-list");
+  const recentSection = document.getElementById("recent-section");
   let chart = null;
-  let period = "month";
+  let period = "day";
 
   function startOf(p) {
     const d = new Date();
@@ -19,8 +21,24 @@
   }
   function fmtMoney(n) { return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-  const recentEl = document.getElementById("recent-list");
-  const recentSection = document.getElementById("recent-section");
+  function formatDateLabel(iso) {
+    const d = new Date(iso + "T00:00:00");
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const yest = new Date(today); yest.setDate(today.getDate() - 1);
+    if (iso === today.toISOString().slice(0, 10)) return "Today";
+    if (iso === yest.toISOString().slice(0, 10)) return "Yesterday";
+    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  }
+
+  async function handleDelete(id) {
+    const ok = await window.confirmModal({
+      title: "Delete this entry?",
+      message: "This action cannot be undone.",
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (ok) { Store.remove(id); render(); }
+  }
 
   function render() {
     const start = startOf(period);
@@ -77,7 +95,6 @@
       });
     }
 
-    // --- Records list grouped by date ---
     recentEl.innerHTML = "";
     if (all.length === 0) {
       recentSection.style.display = "none";
@@ -102,7 +119,12 @@
               <div class="record-title">${r.description || r.category}</div>
               <div class="record-sub">${r.category}${r.subcategory ? " · " + r.subcategory : ""}</div>
             </div>
-            <div class="record-amt">${fmtMoney(r.cost)}</div>`;
+            <div class="record-amt">${fmtMoney(r.cost)}</div>
+            <div class="record-actions">
+              <a class="record-act" href="add.html?edit=${r.id}" aria-label="Edit"><i data-lucide="pencil"></i></a>
+              <button class="record-act danger" data-del="${r.id}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
+            </div>`;
+          item.querySelector("[data-del]").addEventListener("click", () => handleDelete(r.id));
           recentEl.appendChild(item);
         });
       });
@@ -111,22 +133,14 @@
     window.refreshIcons && window.refreshIcons();
   }
 
-  function formatDateLabel(iso) {
-    const d = new Date(iso + "T00:00:00");
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const yest = new Date(today); yest.setDate(today.getDate() - 1);
-    const isoToday = today.toISOString().slice(0, 10);
-    const isoYest = yest.toISOString().slice(0, 10);
-    if (iso === isoToday) return "Today";
-    if (iso === isoYest) return "Yesterday";
-    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
-  }
-
-  periodBtns.forEach(b => b.addEventListener("click", () => {
-    period = b.dataset.period;
-    periodBtns.forEach(x => x.classList.toggle("active", x === b));
-    render();
-  }));
+  periodBtns.forEach(b => {
+    b.classList.toggle("active", b.dataset.period === period);
+    b.addEventListener("click", () => {
+      period = b.dataset.period;
+      periodBtns.forEach(x => x.classList.toggle("active", x === b));
+      render();
+    });
+  });
 
   render();
 })();

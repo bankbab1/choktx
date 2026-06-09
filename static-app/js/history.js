@@ -20,6 +20,24 @@
     return new Date(0);
   }
   function fmt(n) { return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function formatDateLabel(iso) {
+    const d = new Date(iso + "T00:00:00");
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const yest = new Date(today); yest.setDate(today.getDate() - 1);
+    if (iso === today.toISOString().slice(0, 10)) return "Today";
+    if (iso === yest.toISOString().slice(0, 10)) return "Yesterday";
+    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  }
+
+  async function handleDelete(id) {
+    const ok = await window.confirmModal({
+      title: "Delete this entry?",
+      message: "This action cannot be undone.",
+      confirmText: "Delete",
+      danger: true,
+    });
+    if (ok) { Store.remove(id); render(); }
+  }
 
   function render() {
     const cat = filterCat.value;
@@ -36,7 +54,7 @@
       const dayTotal = groups[date].reduce((s, r) => s + Number(r.cost), 0);
       const head = document.createElement("div");
       head.className = "day-head";
-      head.innerHTML = `<span>${date}</span><span>${fmt(dayTotal)}</span>`;
+      head.innerHTML = `<span>${formatDateLabel(date)}</span><span>${fmt(dayTotal)}</span>`;
       listEl.appendChild(head);
 
       groups[date].forEach(r => {
@@ -50,10 +68,11 @@
             <div class="record-sub">${r.category}${r.subcategory ? " · " + r.subcategory : ""}</div>
           </div>
           <div class="record-amt">${fmt(r.cost)}</div>
-          <button class="record-del" aria-label="Delete"><i data-lucide="trash-2"></i></button>`;
-        item.querySelector(".record-del").addEventListener("click", () => {
-          if (confirm("Delete this entry?")) { Store.remove(r.id); render(); }
-        });
+          <div class="record-actions">
+            <a class="record-act" href="add.html?edit=${r.id}" aria-label="Edit"><i data-lucide="pencil"></i></a>
+            <button class="record-act danger" data-del="${r.id}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
+          </div>`;
+        item.querySelector("[data-del]").addEventListener("click", () => handleDelete(r.id));
         listEl.appendChild(item);
       });
     });
