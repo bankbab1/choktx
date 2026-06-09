@@ -11,7 +11,9 @@
   <div class="app">
     <header class="app-header">
       <h1>Add Expense</h1>
-      <a href="index.html" class="icon-btn" aria-label="Close">✕</a>
+      <a href="index.html" class="icon-btn" aria-label="Close">
+        <i data-lucide="x"></i>
+      </a>
     </header>
 
     <main class="app-content">
@@ -45,19 +47,12 @@
       </form>
     </main>
 
-    <nav class="bottom-nav">
-      <div class="bottom-nav-inner">
-        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
-        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
-        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
-        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
-        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
-      </div>
-    </nav>
+    <div id="bottom-nav-slot"></div>
   </div>
 
   <div class="toast" id="toast">Saved</div>
 
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="js/categories.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/nav.js"></script>

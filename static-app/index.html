@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6366f1" />
+  <meta name="theme-color" content="#0a0a0f" />
   <title>Dashboard · Expense Tracker</title>
   <link rel="stylesheet" href="css/styles.css" />
   <script src="js/theme.js"></script>
@@ -12,7 +12,9 @@
   <div class="app">
     <header class="app-header">
       <h1>Dashboard</h1>
-      <button class="icon-btn" onclick="Theme.toggle(); location.reload();" aria-label="Toggle theme">🌓</button>
+      <button class="icon-btn" onclick="Theme.toggle();location.reload();" aria-label="Toggle theme">
+        <i data-lucide="moon"></i>
+      </button>
     </header>
 
     <main class="app-content">
@@ -35,23 +37,16 @@
         </div>
         <div id="breakdown"></div>
         <div class="empty" id="empty" style="display:none">
-          <div class="empty-icon">📊</div>
-          <div>No expenses yet. Tap + to add one.</div>
+          <i data-lucide="bar-chart-3"></i>
+          <div class="empty-text">No expenses yet. Tap + to add one.</div>
         </div>
       </div>
     </main>
 
-    <nav class="bottom-nav">
-      <div class="bottom-nav-inner">
-        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
-        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
-        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
-        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
-        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
-      </div>
-    </nav>
+    <div id="bottom-nav-slot" data-active="home"></div>
   </div>
 
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="js/categories.js"></script>
   <script src="js/storage.js"></script>

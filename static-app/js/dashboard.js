@@ -13,11 +13,7 @@
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     if (p === "day") return d;
-    if (p === "week") {
-      const day = d.getDay(); // 0 Sun
-      d.setDate(d.getDate() - day);
-      return d;
-    }
+    if (p === "week") { d.setDate(d.getDate() - d.getDay()); return d; }
     if (p === "month") { d.setDate(1); return d; }
     if (p === "year") { d.setMonth(0, 1); return d; }
   }
@@ -50,12 +46,13 @@
         .sort((a, b) => b.v - a.v)
         .forEach(({ l, v, c }) => {
           const pct = ((v / total) * 100).toFixed(1);
+          const meta = CATEGORIES[l] || { icon: "circle" };
           const row = document.createElement("div");
           row.className = "cat-row";
           row.innerHTML = `
             <div class="cat-row-head">
-              <span class="cat-dot" style="background:${c}"></span>
-              <span class="cat-name">${CATEGORIES[l]?.icon || ""} ${l}</span>
+              <span class="cat-icon" style="background:${c}1a;color:${c}"><i data-lucide="${meta.icon}"></i></span>
+              <span class="cat-name">${l}</span>
               <span class="cat-amt">${fmtMoney(v)}</span>
             </div>
             <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%;background:${c}"></div></div>
@@ -71,11 +68,13 @@
         data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth: 0 }] },
         options: {
           plugins: { legend: { display: false } },
-          cutout: "70%",
+          cutout: "72%",
           maintainAspectRatio: false,
         },
       });
     }
+
+    window.refreshIcons && window.refreshIcons();
   }
 
   periodBtns.forEach(b => b.addEventListener("click", () => {

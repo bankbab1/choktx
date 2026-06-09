@@ -8,14 +8,11 @@
   const costEl = document.getElementById("cost");
   const toast = document.getElementById("toast");
 
-  // default date = today
-  const today = new Date();
-  dateEl.value = today.toISOString().slice(0, 10);
+  dateEl.value = new Date().toISOString().slice(0, 10);
 
-  // populate categories
   CATEGORY_NAMES.forEach(n => {
     const o = document.createElement("option");
-    o.value = n; o.textContent = `${CATEGORIES[n].icon} ${n}`;
+    o.value = n; o.textContent = n;
     catEl.appendChild(o);
   });
 
