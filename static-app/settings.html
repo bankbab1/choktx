@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Settings · Expense Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Settings</h1>
+    </header>
+
+    <main class="app-content">
+      <div class="card">
+        <div class="setting-row">
+          <div>
+            <div class="setting-row-label">Dark mode</div>
+            <div class="setting-row-desc">Switch between light & dark theme</div>
+          </div>
+          <button class="btn btn-ghost" style="width:auto;padding:8px 16px" onclick="Theme.toggle();location.reload();">Toggle</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Data</h3>
+        <div class="setting-row">
+          <div>
+            <div class="setting-row-label">Export</div>
+            <div class="setting-row-desc">Download all records as JSON</div>
+          </div>
+          <button class="btn btn-ghost" style="width:auto;padding:8px 16px" onclick="exportData()">Export</button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-row-label">Import</div>
+            <div class="setting-row-desc">Replace data from JSON file</div>
+          </div>
+          <label class="btn btn-ghost" style="width:auto;padding:8px 16px;cursor:pointer;margin:0">
+            Import
+            <input type="file" accept="application/json" style="display:none" onchange="importData(event)" />
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-row-label">Clear all data</div>
+            <div class="setting-row-desc">Delete every record permanently</div>
+          </div>
+          <button class="btn btn-danger" style="width:auto;padding:8px 16px" onclick="clearAll()">Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;font-size:14px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">Categories</h3>
+        <div id="cat-list"></div>
+      </div>
+
+      <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:20px 0">
+        Expense Tracker · Local-only · Data stored in your browser
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
+        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
+        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
+        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
+      </div>
+    </nav>
+  </div>
+
+  <script src="js/categories.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script>
+    // Render category list
+    const catList = document.getElementById("cat-list");
+    CATEGORY_NAMES.forEach(n => {
+      const meta = CATEGORIES[n];
+      const div = document.createElement("div");
+      div.className = "cat-info";
+      div.innerHTML = `
+        <div class="cat-info-name" style="color:${meta.color}">${meta.icon} ${n}</div>
+        <div class="cat-info-subs">${meta.sub.length ? meta.sub.join(" · ") : "No subcategories"}</div>`;
+      catList.appendChild(div);
+    });
+
+    function exportData() {
+      const blob = new Blob([Store.exportJSON()], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `expenses-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try { Store.importJSON(ev.target.result); alert("Imported successfully"); }
+        catch (err) { alert("Import failed: " + err.message); }
+      };
+      reader.readAsText(file);
+    }
+    function clearAll() {
+      if (confirm("Delete ALL records? This cannot be undone.")) {
+        Store.clear();
+        alert("All data cleared");
+      }
+    }
+  </script>
+</body>
+</html>

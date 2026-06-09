@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>History · Expense Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>History</h1>
+      <a href="add.html" class="icon-btn" aria-label="Add">+</a>
+    </header>
+
+    <main class="app-content">
+      <div class="filters">
+        <select id="filter-period">
+          <option value="all">All time</option>
+          <option value="day">Today</option>
+          <option value="week">This week</option>
+          <option value="month" selected>This month</option>
+          <option value="year">This year</option>
+        </select>
+        <select id="filter-cat">
+          <option value="">All categories</option>
+        </select>
+      </div>
+
+      <div id="list"></div>
+      <div class="empty" id="empty" style="display:none">
+        <div class="empty-icon">📭</div>
+        <div>No records found.</div>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a href="index.html"><span class="nav-icon">🏠</span><span>Home</span></a>
+        <a href="history.html"><span class="nav-icon">📋</span><span>History</span></a>
+        <a href="add.html" class="add-btn"><span class="nav-icon">+</span><span>Add</span></a>
+        <a href="settings.html"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+        <a href="#" onclick="event.preventDefault();Theme.toggle();location.reload();"><span class="nav-icon">🌓</span><span>Theme</span></a>
+      </div>
+    </nav>
+  </div>
+
+  <script src="js/categories.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/history.js"></script>
+</body>
+</html>
