@@ -95,10 +95,12 @@ body {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 0 8px;
+  padding: 0 12px;
+  gap: 4px;
 }
 .bottom-nav a {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   text-decoration: none;
   color: var(--text-muted);
   display: flex;
@@ -113,16 +115,19 @@ body {
 .bottom-nav a svg { width: 22px; height: 22px; stroke-width: 2; }
 .bottom-nav a.active { color: var(--text); }
 .bottom-nav a.add-btn {
-  flex: 0;
-  width: 54px; height: 54px;
-  margin-top: -22px;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  margin-top: -24px;
   background: var(--primary);
   color: var(--primary-fg);
   border-radius: 50%;
   justify-content: center;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  gap: 0;
+  padding: 0;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.18);
 }
-.bottom-nav a.add-btn svg { width: 24px; height: 24px; stroke-width: 2.5; }
+.bottom-nav a.add-btn svg { width: 26px; height: 26px; stroke-width: 2.5; }
 .bottom-nav a.add-btn span { display: none; }
 
 /* === Cards === */
