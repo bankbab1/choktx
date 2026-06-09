@@ -33,7 +33,7 @@
   function showToast(msg) {
     toast.textContent = msg;
     toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 1800);
+    setTimeout(() => toast.classList.remove("show"), 1500);
   }
 
   form.addEventListener("submit", (e) => {
@@ -45,11 +45,13 @@
       description: descEl.value.trim(),
       cost: parseFloat(costEl.value),
     };
-    if (!rec.date || !rec.category || isNaN(rec.cost)) return;
+    if (!rec.date || !rec.category || isNaN(rec.cost) || rec.cost <= 0) {
+      showToast("Please enter a valid amount");
+      return;
+    }
     Store.add(rec);
     showToast("Expense saved");
-    form.reset();
-    dateEl.value = new Date().toISOString().slice(0, 10);
-    renderSub();
+    // Return to dashboard so the user immediately sees the updated totals
+    setTimeout(() => { window.location.href = "index.html"; }, 700);
   });
 })();
