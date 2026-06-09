@@ -19,6 +19,9 @@
   }
   function fmtMoney(n) { return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
+  const recentEl = document.getElementById("recent-list");
+  const recentSection = document.getElementById("recent-section");
+
   function render() {
     const start = startOf(period);
     const all = Store.all().filter(r => new Date(r.date) >= start);
@@ -74,7 +77,49 @@
       });
     }
 
+    // --- Records list grouped by date ---
+    recentEl.innerHTML = "";
+    if (all.length === 0) {
+      recentSection.style.display = "none";
+    } else {
+      recentSection.style.display = "block";
+      const groups = {};
+      all.forEach(r => { (groups[r.date] = groups[r.date] || []).push(r); });
+      Object.keys(groups).sort((a, b) => b.localeCompare(a)).forEach(date => {
+        const dayTotal = groups[date].reduce((s, r) => s + Number(r.cost), 0);
+        const head = document.createElement("div");
+        head.className = "day-head";
+        head.innerHTML = `<span>${formatDateLabel(date)}</span><span>${fmtMoney(dayTotal)}</span>`;
+        recentEl.appendChild(head);
+
+        groups[date].forEach(r => {
+          const meta = CATEGORIES[r.category] || { color: "#888", icon: "circle" };
+          const item = document.createElement("div");
+          item.className = "record";
+          item.innerHTML = `
+            <div class="record-icon" style="background:${meta.color}1a;color:${meta.color}"><i data-lucide="${meta.icon}"></i></div>
+            <div class="record-body">
+              <div class="record-title">${r.description || r.category}</div>
+              <div class="record-sub">${r.category}${r.subcategory ? " · " + r.subcategory : ""}</div>
+            </div>
+            <div class="record-amt">${fmtMoney(r.cost)}</div>`;
+          recentEl.appendChild(item);
+        });
+      });
+    }
+
     window.refreshIcons && window.refreshIcons();
+  }
+
+  function formatDateLabel(iso) {
+    const d = new Date(iso + "T00:00:00");
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const yest = new Date(today); yest.setDate(today.getDate() - 1);
+    const isoToday = today.toISOString().slice(0, 10);
+    const isoYest = yest.toISOString().slice(0, 10);
+    if (iso === isoToday) return "Today";
+    if (iso === isoYest) return "Yesterday";
+    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
   }
 
   periodBtns.forEach(b => b.addEventListener("click", () => {
