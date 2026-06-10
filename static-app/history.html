@@ -24,10 +24,15 @@
           <option value="week">This week</option>
           <option value="month" selected>This month</option>
           <option value="year">This year</option>
+          <option value="custom">Custom range…</option>
         </select>
         <select id="filter-cat">
           <option value="">All categories</option>
         </select>
+      </div>
+      <div class="filters" id="range-row" style="display:none">
+        <input type="date" id="range-from" aria-label="From" />
+        <input type="date" id="range-to" aria-label="To" />
       </div>
 
       <div id="list"></div>
