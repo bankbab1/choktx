@@ -350,8 +350,10 @@ body {
 
 /* === History === */
 .filters { display: flex; gap: 8px; margin-bottom: 12px; }
-.filters select {
+.filters select,
+.filters input[type="date"] {
   flex: 1;
+  min-width: 0;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--border);
