@@ -3,6 +3,9 @@
   const emptyEl = document.getElementById("empty");
   const filterCat = document.getElementById("filter-cat");
   const filterPeriod = document.getElementById("filter-period");
+  const rangeRow = document.getElementById("range-row");
+  const rangeFrom = document.getElementById("range-from");
+  const rangeTo = document.getElementById("range-to");
 
   CATEGORY_NAMES.forEach(n => {
     const o = document.createElement("option");
@@ -11,7 +14,7 @@
   });
 
   function startOf(p) {
-    if (p === "all") return new Date(0);
+    if (p === "all" || p === "custom") return new Date(0);
     const d = new Date(); d.setHours(0, 0, 0, 0);
     if (p === "day") return d;
     if (p === "week") { d.setDate(d.getDate() - d.getDay()); return d; }
@@ -49,10 +52,20 @@
 
   function render() {
     const cat = filterCat.value;
-    const start = startOf(filterPeriod.value);
-    const rows = Store.all().filter(r =>
-      (!cat || r.category === cat) && new Date(r.date) >= start
-    );
+    const period = filterPeriod.value;
+    rangeRow.style.display = period === "custom" ? "flex" : "none";
+    const start = startOf(period);
+    const from = period === "custom" && rangeFrom.value ? rangeFrom.value : null;
+    const to = period === "custom" && rangeTo.value ? rangeTo.value : null;
+    const rows = Store.all().filter(r => {
+      if (cat && r.category !== cat) return false;
+      if (period === "custom") {
+        if (from && r.date < from) return false;
+        if (to && r.date > to) return false;
+        return true;
+      }
+      return new Date(r.date) >= start;
+    });
     listEl.innerHTML = "";
     emptyEl.style.display = rows.length ? "none" : "block";
 
@@ -90,6 +103,8 @@
 
   filterCat.addEventListener("change", render);
   filterPeriod.addEventListener("change", render);
+  rangeFrom.addEventListener("change", render);
+  rangeTo.addEventListener("change", render);
   render();
   window.onExpenseSaved = render;
 })();

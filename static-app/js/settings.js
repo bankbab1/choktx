@@ -105,7 +105,7 @@
         setTimeout(() => { root.innerHTML = ""; document.body.style.overflow = prevOverflow; }, 220);
       }
 
-      backdrop.addEventListener("click", (e) => { if (e.target.dataset.close !== undefined) close(); });
+      backdrop.addEventListener("click", (e) => { if (e.target.closest("[data-close]") || e.target === backdrop) close(); });
 
       root.querySelectorAll("[data-color]").forEach(b => b.addEventListener("click", () => {
         state.color = b.dataset.color;

@@ -46,7 +46,7 @@
     document.addEventListener("keydown", onKey);
 
     backdrop.addEventListener("click", (e) => {
-      if (e.target.dataset.close !== undefined) close();
+      if (e.target.closest("[data-close]") || e.target === backdrop) close();
     });
 
     // Swipe-down to close (drag the handle area, or the sheet when scrolled to top)
