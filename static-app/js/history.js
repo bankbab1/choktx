@@ -103,6 +103,8 @@
 
   filterCat.addEventListener("change", render);
   filterPeriod.addEventListener("change", render);
+  rangeFrom.addEventListener("change", render);
+  rangeTo.addEventListener("change", render);
   render();
   window.onExpenseSaved = render;
 })();
