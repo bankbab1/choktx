@@ -75,7 +75,7 @@
     const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
 
     let paymentMethod = "Offline";
-    let paidBy = "Cash";
+    let paidBy = (window.PAID_METHODS && window.PAID_METHODS[0] && window.PAID_METHODS[0].name) || "Cash";
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
