@@ -37,18 +37,10 @@
         <div class="field">
           <label>Paid By</label>
           <div class="seg-cards seg-cards-4" data-f="paidby">
-            <button type="button" class="seg-card active" data-paidby="Cash">
-              <i data-lucide="banknote"></i><span>Cash</span>
-            </button>
-            <button type="button" class="seg-card" data-paidby="Mobile Banking">
-              <i data-lucide="smartphone"></i><span>Mobile Banking</span>
-            </button>
-            <button type="button" class="seg-card" data-paidby="Credit">
-              <i data-lucide="credit-card"></i><span>Credit</span>
-            </button>
-            <button type="button" class="seg-card" data-paidby="Spaylater">
-              <i data-lucide="clock"></i><span>Spaylater</span>
-            </button>
+            ${(window.PAID_METHODS || []).map((m, i) => `
+              <button type="button" class="seg-card ${i===0?"active":""}" data-paidby="${m.name.replace(/"/g,"&quot;")}">
+                <i data-lucide="${m.icon}"></i><span>${m.name}</span>
+              </button>`).join("")}
           </div>
         </div>
         <div class="field">
