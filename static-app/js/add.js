@@ -35,6 +35,23 @@
           </div>
         </div>
         <div class="field">
+          <label>Paid By</label>
+          <div class="seg-cards seg-cards-4" data-f="paidby">
+            <button type="button" class="seg-card active" data-paidby="Cash">
+              <i data-lucide="banknote"></i><span>Cash</span>
+            </button>
+            <button type="button" class="seg-card" data-paidby="Mobile Banking">
+              <i data-lucide="smartphone"></i><span>Mobile Banking</span>
+            </button>
+            <button type="button" class="seg-card" data-paidby="Credit">
+              <i data-lucide="credit-card"></i><span>Credit</span>
+            </button>
+            <button type="button" class="seg-card" data-paidby="Spaylater">
+              <i data-lucide="clock"></i><span>Spaylater</span>
+            </button>
+          </div>
+        </div>
+        <div class="field">
           <label>Category</label>
           <select data-f="category" required></select>
         </div>
@@ -62,9 +79,11 @@
     const subEl = form.querySelector('[data-f="subcategory"]');
     const descEl = form.querySelector('[data-f="description"]');
     const submitBtn = form.querySelector('[data-f="submit"]');
-    const payCards = form.querySelectorAll(".seg-card");
+    const payCards = form.querySelectorAll('[data-f="pay"] .seg-card');
+    const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
 
     let paymentMethod = "Offline";
+    let paidBy = "Cash";
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
@@ -110,6 +129,11 @@
       payCards.forEach(x => x.classList.toggle("active", x === c));
     }));
 
+    paidByCards.forEach(c => c.addEventListener("click", () => {
+      paidBy = c.dataset.paidby;
+      paidByCards.forEach(x => x.classList.toggle("active", x === c));
+    }));
+
     if (existing) {
       submitBtn.textContent = "Update Expense";
       dateEl.value = existing.date;
@@ -119,6 +143,8 @@
       costEl.value = Number(existing.cost).toFixed(2);
       paymentMethod = existing.paymentMethod || "Offline";
       payCards.forEach(x => x.classList.toggle("active", x.dataset.pay === paymentMethod));
+      paidBy = existing.paidBy || "Cash";
+      paidByCards.forEach(x => x.classList.toggle("active", x.dataset.paidby === paidBy));
     } else {
       dateEl.value = todayGMT7();
       renderSub();
@@ -146,6 +172,7 @@
         description: descEl.value.trim(),
         cost: parseFloat(parseFloat(costEl.value).toFixed(2)),
         paymentMethod,
+        paidBy,
       };
       if (!rec.date || !rec.category || isNaN(rec.cost) || rec.cost <= 0) {
         (showToast || alert)("Please enter a valid amount");
