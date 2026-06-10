@@ -1,6 +1,7 @@
-// localStorage wrapper for expense records
+// localStorage wrapper for expense records + categories
 (function () {
   const KEY = "expenses_v1";
+  const CAT_KEY = "categories_v1";
 
   function read() {
     try { return JSON.parse(localStorage.getItem(KEY)) || []; }
@@ -33,6 +34,18 @@
       const data = JSON.parse(text);
       if (!Array.isArray(data)) throw new Error("Invalid file");
       write(data);
+    },
+
+    // Categories
+    getCategories() {
+      try {
+        const raw = localStorage.getItem(CAT_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return null;
+    },
+    setCategories(obj) {
+      localStorage.setItem(CAT_KEY, JSON.stringify(obj));
     },
   };
 })();
