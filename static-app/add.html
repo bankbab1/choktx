@@ -19,13 +19,27 @@
     <main class="app-content">
       <form id="expense-form" class="card">
         <div class="field">
-          <label for="cost">Amount</label>
-          <input id="cost" class="cost-input" type="number" step="0.01" min="0" placeholder="0.00" required />
+          <label for="date">Date</label>
+          <input id="date" type="date" required />
         </div>
 
         <div class="field">
-          <label for="date">Date</label>
-          <input id="date" type="date" required />
+          <label for="cost">Amount</label>
+          <input id="cost" class="cost-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" required />
+        </div>
+
+        <div class="field">
+          <label>Payment Method</label>
+          <div class="seg-cards">
+            <button type="button" class="seg-card active" data-pay="Offline">
+              <i data-lucide="wallet"></i>
+              <span>Offline</span>
+            </button>
+            <button type="button" class="seg-card" data-pay="Online">
+              <i data-lucide="credit-card"></i>
+              <span>Online</span>
+            </button>
+          </div>
         </div>
 
         <div class="field">
@@ -40,7 +54,7 @@
 
         <div class="field">
           <label for="description">Description</label>
-          <input id="description" type="text" placeholder="What was it for?" maxlength="100" />
+          <input id="description" type="text" placeholder="What was it for?" maxlength="120" />
         </div>
 
         <button class="btn" type="submit">Save Expense</button>
