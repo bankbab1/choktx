@@ -17,48 +17,7 @@
     </header>
 
     <main class="app-content">
-      <form id="expense-form" class="card">
-        <div class="field">
-          <label for="date">Date</label>
-          <input id="date" type="date" required />
-        </div>
-
-        <div class="field">
-          <label for="cost">Amount</label>
-          <input id="cost" class="cost-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" required />
-        </div>
-
-        <div class="field">
-          <label>Payment Method</label>
-          <div class="seg-cards">
-            <button type="button" class="seg-card active" data-pay="Offline">
-              <i data-lucide="wallet"></i>
-              <span>Offline</span>
-            </button>
-            <button type="button" class="seg-card" data-pay="Online">
-              <i data-lucide="credit-card"></i>
-              <span>Online</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="category">Category</label>
-          <select id="category" required></select>
-        </div>
-
-        <div class="field" id="sub-wrap" style="display:none">
-          <label for="subcategory">Subcategory</label>
-          <select id="subcategory"></select>
-        </div>
-
-        <div class="field">
-          <label for="description">Description</label>
-          <input id="description" type="text" placeholder="What was it for?" maxlength="120" />
-        </div>
-
-        <button class="btn" type="submit">Save Expense</button>
-      </form>
+      <div id="expense-form-host" class="card"></div>
     </main>
 
     <div id="bottom-nav-slot"></div>
@@ -67,8 +26,8 @@
   <div class="toast" id="toast">Saved</div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="js/categories.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/categories.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/add.js"></script>
 </body>

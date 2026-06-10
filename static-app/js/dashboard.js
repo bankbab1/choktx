@@ -129,7 +129,7 @@
             </div>
             <div class="record-amt">${fmtMoney(r.cost)}</div>
             <div class="record-actions">
-              <a class="record-act" href="add.html?edit=${r.id}" aria-label="Edit"><i data-lucide="pencil"></i></a>
+              <a class="record-act" href="add.html?edit=${r.id}" data-edit="${r.id}" aria-label="Edit"><i data-lucide="pencil"></i></a>
               <button class="record-act danger" data-del="${r.id}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
             </div>`;
           item.querySelector("[data-del]").addEventListener("click", () => handleDelete(r.id));
@@ -151,4 +151,5 @@
   });
 
   render();
+  window.onExpenseSaved = render;
 })();
