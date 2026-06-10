@@ -596,10 +596,43 @@ body {
   border-color: var(--danger);
 }
 
+/* Centered iOS-style alert */
+.modal.modal-center { text-align: center; padding: 26px 22px 18px; max-width: 320px; }
+.modal-center .modal-title { font-size: 18px; margin-bottom: 8px; }
+.modal-center .modal-message { font-size: 14px; margin-bottom: 20px; }
+.modal-actions-stack { flex-direction: column; gap: 10px; }
+.modal-actions-stack .btn-sm { width: 100%; padding: 12px 16px; border-radius: 12px; font-size: 15px; }
+
+.modal-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  margin: 0 auto 14px;
+  animation: iconPop .35s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-icon svg { width: 34px; height: 34px; stroke-width: 3; }
+.mi-success { background: color-mix(in srgb, var(--success, #22c55e) 18%, transparent); color: var(--success, #22c55e); }
+.mi-error   { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+.mi-warning { background: color-mix(in srgb, #f59e0b 18%, transparent); color: #f59e0b; }
+.mi-info    { background: color-mix(in srgb, var(--primary) 18%, transparent); color: var(--primary); }
+
+.modal-backdrop.closing { animation: fadeOut .14s ease-in forwards; }
+.modal-backdrop.closing .modal { animation: popOut .14s ease-in forwards; }
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 @keyframes pop {
-  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
   to { opacity: 1; transform: none; }
+}
+@keyframes popOut {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(0.96); }
+}
+@keyframes iconPop {
+  0% { opacity: 0; transform: scale(0.3); }
+  60% { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* === Prevent pull-to-refresh / overscroll bounce === */

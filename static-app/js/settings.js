@@ -149,7 +149,7 @@
         if (!name) { nameInput.focus(); return; }
         const next = structuredClone(CATEGORIES);
         if (isEdit && name !== originalName) delete next[originalName];
-        if (!isEdit && next[name]) { alert("Category already exists"); return; }
+        if (!isEdit && next[name]) { window.alertModal({ title: "Already exists", message: `A category named "${name}" already exists.`, icon: "warning" }); return; }
         next[name] = { color: state.color, icon: state.icon, sub: state.sub };
         saveCategories(next);
         close();
@@ -201,8 +201,8 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => {
-      try { Store.importJSON(ev.target.result); alert("Imported successfully"); }
-      catch (err) { alert("Import failed: " + err.message); }
+      try { Store.importJSON(ev.target.result); window.alertModal({ title: "Imported", message: "Your data has been imported successfully.", icon: "success" }); }
+      catch (err) { window.alertModal({ title: "Import failed", message: err.message, icon: "error" }); }
     };
     reader.readAsText(file);
   };
@@ -297,7 +297,7 @@
       const name = nameInput.value.trim();
       if (!name) { nameInput.focus(); return; }
       const next = structuredClone(window.PAID_METHODS);
-      if (!isEdit && next.some(m => m.name === name)) { alert("Method already exists"); return; }
+      if (!isEdit && next.some(m => m.name === name)) { window.alertModal({ title: "Already exists", message: `A method named "${name}" already exists.`, icon: "warning" }); return; }
       const entry = { name, icon: state.icon };
       if (isEdit) next[idx] = entry; else next.push(entry);
       savePaidMethods(next);
