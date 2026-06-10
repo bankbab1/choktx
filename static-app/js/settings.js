@@ -201,8 +201,8 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => {
-      try { Store.importJSON(ev.target.result); alert("Imported successfully"); }
-      catch (err) { alert("Import failed: " + err.message); }
+      try { Store.importJSON(ev.target.result); window.alertModal({ title: "Imported", message: "Your data has been imported successfully.", icon: "success" }); }
+      catch (err) { window.alertModal({ title: "Import failed", message: err.message, icon: "error" }); }
     };
     reader.readAsText(file);
   };
