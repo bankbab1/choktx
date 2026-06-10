@@ -101,10 +101,18 @@
     window.refreshIcons && window.refreshIcons();
   }
 
+  function syncRangeBounds() {
+    rangeTo.min = rangeFrom.value || "";
+    rangeFrom.max = rangeTo.value || "";
+    if (rangeFrom.value && rangeTo.value && rangeTo.value < rangeFrom.value) {
+      rangeTo.value = rangeFrom.value;
+    }
+  }
   filterCat.addEventListener("change", render);
   filterPeriod.addEventListener("change", render);
-  rangeFrom.addEventListener("change", render);
-  rangeTo.addEventListener("change", render);
+  rangeFrom.addEventListener("change", () => { syncRangeBounds(); render(); });
+  rangeTo.addEventListener("change", () => { syncRangeBounds(); render(); });
+  syncRangeBounds();
   render();
   window.onExpenseSaved = render;
 })();
