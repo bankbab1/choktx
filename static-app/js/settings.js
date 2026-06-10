@@ -149,7 +149,7 @@
         if (!name) { nameInput.focus(); return; }
         const next = structuredClone(CATEGORIES);
         if (isEdit && name !== originalName) delete next[originalName];
-        if (!isEdit && next[name]) { alert("Category already exists"); return; }
+        if (!isEdit && next[name]) { window.alertModal({ title: "Already exists", message: `A category named "${name}" already exists.`, icon: "warning" }); return; }
         next[name] = { color: state.color, icon: state.icon, sub: state.sub };
         saveCategories(next);
         close();
