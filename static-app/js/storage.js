@@ -48,5 +48,17 @@
     setCategories(obj) {
       localStorage.setItem(CAT_KEY, JSON.stringify(obj));
     },
+
+    // Paid methods
+    getPaidMethods() {
+      try {
+        const raw = localStorage.getItem(PAID_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return null;
+    },
+    setPaidMethods(arr) {
+      localStorage.setItem(PAID_KEY, JSON.stringify(arr));
+    },
   };
 })();
