@@ -725,10 +725,13 @@ body { touch-action: pan-y; }
 
 /* Color & icon pickers in category form */
 .swatch-row, .icon-row {
-  display: flex; flex-wrap: wrap; gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 6px;
 }
 .swatch {
-  width: 28px; height: 28px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
@@ -736,7 +739,8 @@ body { touch-action: pan-y; }
 }
 .swatch.active { border-color: var(--text); }
 .icon-pick {
-  width: 36px; height: 36px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 9px;
   border: 1.5px solid var(--border);
   background: var(--surface);
