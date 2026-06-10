@@ -268,8 +268,57 @@ body {
   outline: none;
   transition: border-color .15s;
 }
+.field select,
+.filters select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 40px;
+  cursor: pointer;
+}
 .field input:focus, .field select:focus, .field textarea:focus {
   border-color: var(--text);
+}
+.cost-input {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+/* === Segmented selectable cards (e.g. payment method) === */
+.seg-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.seg-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all .15s;
+}
+.seg-card svg { width: 18px; height: 18px; }
+.seg-card:hover { color: var(--text); }
+.seg-card.active {
+  border-color: var(--text);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 0 var(--text) inset;
 }
 .cost-input {
   font-size: 32px !important;
