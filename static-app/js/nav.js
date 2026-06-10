@@ -9,7 +9,7 @@ window.renderBottomNav = function (active) {
         <a href="history.html"${active === "history" ? ' class="active"' : ""}>
           <i data-lucide="list"></i><span>History</span>
         </a>
-        <a href="add.html" class="add-btn" aria-label="Add expense">
+        <a href="add.html" class="add-btn" data-add aria-label="Add expense">
           <i data-lucide="plus"></i><span>Add</span>
         </a>
         <a href="history.html?period=year"${active === "stats" ? ' class="active"' : ""}>
@@ -26,7 +26,6 @@ window.refreshIcons = function () {
   if (window.lucide) window.lucide.createIcons();
 };
 
-// Instant theme toggle (no reload). Updates icon on header button.
 window.applyThemeIcon = function () {
   document.querySelectorAll("[data-theme-icon]").forEach(el => {
     el.setAttribute("data-lucide", Theme.get() === "dark" ? "sun" : "moon");
@@ -43,4 +42,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const slot = document.getElementById("bottom-nav-slot");
   if (slot) slot.outerHTML = window.renderBottomNav(slot.dataset.active || "");
   window.applyThemeIcon();
+
+  // Intercept Add nav button -> open bottom sheet (when sheet.js is loaded)
+  document.addEventListener("click", (e) => {
+    const addLink = e.target.closest("[data-add]");
+    if (addLink && window.openAddSheet) {
+      e.preventDefault();
+      window.openAddSheet({
+        onSaved: () => {
+          if (typeof window.onExpenseSaved === "function") window.onExpenseSaved();
+        },
+      });
+    }
+    const editLink = e.target.closest("[data-edit]");
+    if (editLink && window.openAddSheet) {
+      e.preventDefault();
+      window.openAddSheet({
+        editId: editLink.dataset.edit,
+        onSaved: () => {
+          if (typeof window.onExpenseSaved === "function") window.onExpenseSaved();
+        },
+      });
+    }
+  });
 });

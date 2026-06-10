@@ -56,6 +56,9 @@
       <div class="card">
         <div class="section-title">Categories</div>
         <div id="cat-list"></div>
+        <button class="btn-add-cat" id="add-cat-btn">
+          <i data-lucide="plus"></i> Add Category
+        </button>
       </div>
 
       <div style="text-align:center;color:var(--text-muted);font-size:12px;padding:20px 0">
@@ -67,50 +70,10 @@
   </div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="js/categories.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/modal.js"></script>
   <script src="js/nav.js"></script>
-  <script>
-    const catList = document.getElementById("cat-list");
-    CATEGORY_NAMES.forEach(n => {
-      const meta = CATEGORIES[n];
-      const div = document.createElement("div");
-      div.className = "cat-info";
-      div.innerHTML = `
-        <div class="cat-icon" style="background:${meta.color}1a;color:${meta.color}"><i data-lucide="${meta.icon}"></i></div>
-        <div class="cat-info-body">
-          <div class="cat-info-name">${n}</div>
-          <div class="cat-info-subs">${meta.sub.length ? meta.sub.join(" · ") : "No subcategories"}</div>
-        </div>`;
-      catList.appendChild(div);
-    });
-
-    function exportData() {
-      const blob = new Blob([Store.exportJSON()], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `expenses-${new Date().toISOString().slice(0,10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-    function importData(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        try { Store.importJSON(ev.target.result); alert("Imported successfully"); }
-        catch (err) { alert("Import failed: " + err.message); }
-      };
-      reader.readAsText(file);
-    }
-    function clearAll() {
-      if (confirm("Delete ALL records? This cannot be undone.")) {
-        Store.clear();
-        alert("All data cleared");
-      }
-    }
-    setTimeout(() => window.refreshIcons && window.refreshIcons(), 0);
-  </script>
+  <script src="js/settings.js"></script>
 </body>
 </html>
