@@ -2,6 +2,7 @@
 (function () {
   const KEY = "expenses_v1";
   const CAT_KEY = "categories_v1";
+  const PAID_KEY = "paid_methods_v1";
 
   function read() {
     try { return JSON.parse(localStorage.getItem(KEY)) || []; }
@@ -46,6 +47,18 @@
     },
     setCategories(obj) {
       localStorage.setItem(CAT_KEY, JSON.stringify(obj));
+    },
+
+    // Paid methods
+    getPaidMethods() {
+      try {
+        const raw = localStorage.getItem(PAID_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      return null;
+    },
+    setPaidMethods(arr) {
+      localStorage.setItem(PAID_KEY, JSON.stringify(arr));
     },
   };
 })();
