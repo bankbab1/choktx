@@ -79,9 +79,11 @@
     const subEl = form.querySelector('[data-f="subcategory"]');
     const descEl = form.querySelector('[data-f="description"]');
     const submitBtn = form.querySelector('[data-f="submit"]');
-    const payCards = form.querySelectorAll(".seg-card");
+    const payCards = form.querySelectorAll('[data-f="pay"] .seg-card');
+    const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
 
     let paymentMethod = "Offline";
+    let paidBy = "Cash";
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
