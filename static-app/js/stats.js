@@ -139,8 +139,8 @@
       options: {
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmt(c.parsed.y) } } },
         scales: {
-          x: { grid: { display: false }, ticks: { color: cssVar("--muted-fg") || "#888", maxRotation: 0, autoSkip: true } },
-          y: { grid: { color: cssVar("--border") || "#2222" }, ticks: { color: cssVar("--muted-fg") || "#888", callback: fmtShort } },
+          x: { grid: { display: false }, ticks: { color: cssVar("--text-muted") || "#888", maxRotation: 0, autoSkip: true } },
+          y: { grid: { color: cssVar("--border") || "#2222" }, ticks: { color: cssVar("--text-muted") || "#888", callback: fmtShort } },
         },
         maintainAspectRatio: false,
       },
@@ -225,8 +225,8 @@
       options: {
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => fmt(c.parsed.y) } } },
         scales: {
-          x: { grid: { display: false }, ticks: { color: cssVar("--muted-fg") || "#888" } },
-          y: { grid: { color: cssVar("--border") || "#2222" }, ticks: { color: cssVar("--muted-fg") || "#888", callback: fmtShort } },
+          x: { grid: { display: false }, ticks: { color: cssVar("--text-muted") || "#888" } },
+          y: { grid: { color: cssVar("--border") || "#2222" }, ticks: { color: cssVar("--text-muted") || "#888", callback: fmtShort } },
         },
         maintainAspectRatio: false,
       },
