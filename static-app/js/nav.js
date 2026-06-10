@@ -12,7 +12,7 @@ window.renderBottomNav = function (active) {
         <a href="add.html" class="add-btn" data-add aria-label="Add expense">
           <i data-lucide="plus"></i><span>Add</span>
         </a>
-        <a href="history.html?period=year"${active === "stats" ? ' class="active"' : ""}>
+        <a href="stats.html"${active === "stats" ? ' class="active"' : ""}>
           <i data-lucide="pie-chart"></i><span>Stats</span>
         </a>
         <a href="settings.html"${active === "settings" ? ' class="active"' : ""}>

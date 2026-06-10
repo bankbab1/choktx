@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Stats · Expense Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>Stats</h1>
+      <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <i data-theme-icon data-lucide="moon"></i>
+      </button>
+    </header>
+
+    <main class="app-content">
+      <div class="period-tabs" id="stats-period">
+        <button class="period-btn" data-period="week">Week</button>
+        <button class="period-btn active" data-period="month">Month</button>
+        <button class="period-btn" data-period="year">Year</button>
+      </div>
+
+      <div class="empty" id="stats-empty" style="display:none">
+        <i data-lucide="bar-chart-3"></i>
+        <div class="empty-text">No data for this period yet.</div>
+      </div>
+
+      <div id="stats-body">
+        <!-- KPI: total + delta vs previous period -->
+        <div class="summary">
+          <div class="summary-label" id="kpi-label">This Month</div>
+          <div class="summary-amount" id="kpi-total">0.00</div>
+          <div class="summary-count">
+            <span id="kpi-count">0 entries</span>
+            <span id="kpi-delta" class="kpi-delta"></span>
+          </div>
+        </div>
+
+        <!-- Quick metric tiles -->
+        <div class="stat-grid">
+          <div class="stat-tile">
+            <div class="stat-tile-label">Avg / day</div>
+            <div class="stat-tile-value" id="kpi-avg-day">0.00</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Avg / entry</div>
+            <div class="stat-tile-value" id="kpi-avg-entry">0.00</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Active days</div>
+            <div class="stat-tile-value" id="kpi-active-days">0</div>
+          </div>
+          <div class="stat-tile">
+            <div class="stat-tile-label">Biggest</div>
+            <div class="stat-tile-value" id="kpi-biggest">0.00</div>
+            <div class="stat-tile-sub" id="kpi-biggest-sub"></div>
+          </div>
+        </div>
+
+        <!-- Trend chart -->
+        <div class="card">
+          <div class="section-heading inner"><span>Spending trend</span></div>
+          <div class="chart-wrap tall">
+            <canvas id="trend-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category breakdown -->
+        <div class="card">
+          <div class="section-heading inner"><span>By category</span></div>
+          <div class="chart-wrap">
+            <canvas id="cat-chart"></canvas>
+          </div>
+          <div id="cat-breakdown"></div>
+        </div>
+
+        <!-- Paid By breakdown -->
+        <div class="card">
+          <div class="section-heading inner"><span>By paid method</span></div>
+          <div id="paid-breakdown"></div>
+        </div>
+
+        <!-- Online vs Offline -->
+        <div class="card">
+          <div class="section-heading inner"><span>Online vs Offline</span></div>
+          <div class="split-bar" id="split-bar"></div>
+          <div class="split-legend" id="split-legend"></div>
+        </div>
+
+        <!-- Day-of-week pattern -->
+        <div class="card">
+          <div class="section-heading inner"><span>Spending by weekday</span></div>
+          <div class="chart-wrap">
+            <canvas id="dow-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="bottom-nav-slot" data-active="stats"></div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/paid-methods.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/add.js"></script>
+  <script src="js/sheet.js"></script>
+  <script src="js/nav.js"></script>
+  <script src="js/stats.js"></script>
+</body>
+</html>
