@@ -296,6 +296,13 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+.seg-cards.seg-cards-4 {
+  grid-template-columns: 1fr 1fr;
+}
+.seg-cards.seg-cards-4 .seg-card {
+  padding: 12px 8px;
+  font-size: 13px;
+}
 .seg-card {
   display: flex;
   align-items: center;
