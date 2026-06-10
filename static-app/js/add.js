@@ -129,6 +129,11 @@
       payCards.forEach(x => x.classList.toggle("active", x === c));
     }));
 
+    paidByCards.forEach(c => c.addEventListener("click", () => {
+      paidBy = c.dataset.paidby;
+      paidByCards.forEach(x => x.classList.toggle("active", x === c));
+    }));
+
     if (existing) {
       submitBtn.textContent = "Update Expense";
       dateEl.value = existing.date;
