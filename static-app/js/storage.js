@@ -2,6 +2,7 @@
 (function () {
   const KEY = "expenses_v1";
   const CAT_KEY = "categories_v1";
+  const PAID_KEY = "paid_methods_v1";
 
   function read() {
     try { return JSON.parse(localStorage.getItem(KEY)) || []; }
