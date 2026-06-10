@@ -9,6 +9,22 @@
   const toast = document.getElementById("toast");
   const submitBtn = form.querySelector('button[type="submit"]');
   const titleEl = document.getElementById("page-title");
+  const payCards = document.querySelectorAll(".seg-card");
+
+  // Today in GMT+7 (Asia/Bangkok)
+  function todayGMT7() {
+    const d = new Date();
+    const bkk = new Date(d.getTime() + (d.getTimezoneOffset() + 420) * 60000);
+    return bkk.toISOString().slice(0, 10);
+  }
+
+  const PREFIX_MAP = {
+    "Fixed Cost|Phone Bill": "Phone bill - ",
+    "Fixed Cost|AI Subscription": "AI - ",
+  };
+  const ALL_PREFIXES = Object.values(PREFIX_MAP);
+
+  let paymentMethod = "Offline";
 
   const editId = new URLSearchParams(location.search).get("edit");
   const existing = editId ? Store.get(editId) : null;
@@ -31,7 +47,33 @@
       subEl.appendChild(o);
     });
   }
-  catEl.addEventListener("change", () => renderSub());
+
+  function applyDescPrefix() {
+    const key = catEl.value + "|" + (subEl.value || "");
+    const prefix = PREFIX_MAP[key];
+    if (!prefix) return;
+    const cur = descEl.value || "";
+    // Only inject prefix if empty, or currently matches a different known prefix
+    const matchesOther = ALL_PREFIXES.some(p => p !== prefix && cur.startsWith(p));
+    if (cur.trim() === "" || matchesOther) {
+      // strip other prefix if present
+      let rest = cur;
+      ALL_PREFIXES.forEach(p => { if (rest.startsWith(p)) rest = rest.slice(p.length); });
+      descEl.value = prefix + rest;
+      // Move caret to end
+      descEl.focus();
+      const len = descEl.value.length;
+      descEl.setSelectionRange(len, len);
+    }
+  }
+
+  catEl.addEventListener("change", () => { renderSub(); applyDescPrefix(); });
+  subEl.addEventListener("change", applyDescPrefix);
+
+  payCards.forEach(c => c.addEventListener("click", () => {
+    paymentMethod = c.dataset.pay;
+    payCards.forEach(x => x.classList.toggle("active", x === c));
+  }));
 
   if (existing) {
     titleEl.textContent = "Edit Expense";
@@ -40,11 +82,32 @@
     catEl.value = existing.category;
     renderSub(existing.subcategory);
     descEl.value = existing.description || "";
-    costEl.value = existing.cost;
+    costEl.value = Number(existing.cost).toFixed(2);
+    paymentMethod = existing.paymentMethod || "Offline";
+    payCards.forEach(x => x.classList.toggle("active", x.dataset.pay === paymentMethod));
   } else {
-    dateEl.value = new Date().toISOString().slice(0, 10);
+    dateEl.value = todayGMT7();
     renderSub();
+    payCards.forEach(x => x.classList.toggle("active", x.dataset.pay === "Offline"));
   }
+
+  // Cost input: restrict to number with up to 2 decimals; format on blur
+  costEl.addEventListener("input", () => {
+    let v = costEl.value;
+    // remove invalid chars
+    v = v.replace(/[^0-9.]/g, "");
+    // only first dot
+    const parts = v.split(".");
+    if (parts.length > 2) v = parts[0] + "." + parts.slice(1).join("");
+    // clip to 2 decimals
+    const [i, d] = v.split(".");
+    if (d !== undefined) v = i + "." + d.slice(0, 2);
+    if (v !== costEl.value) costEl.value = v;
+  });
+  costEl.addEventListener("blur", () => {
+    if (costEl.value === "" || isNaN(parseFloat(costEl.value))) return;
+    costEl.value = parseFloat(costEl.value).toFixed(2);
+  });
 
   function showToast(msg) {
     toast.textContent = msg;
@@ -59,7 +122,8 @@
       category: catEl.value,
       subcategory: subEl.value || null,
       description: descEl.value.trim(),
-      cost: parseFloat(costEl.value),
+      cost: parseFloat(parseFloat(costEl.value).toFixed(2)),
+      paymentMethod,
     };
     if (!rec.date || !rec.category || isNaN(rec.cost) || rec.cost <= 0) {
       showToast("Please enter a valid amount");

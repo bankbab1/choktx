@@ -20,13 +20,21 @@
     return new Date(0);
   }
   function fmt(n) { return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function todayISO_GMT7() {
+    const d = new Date();
+    const bkk = new Date(d.getTime() + (d.getTimezoneOffset() + 420) * 60000);
+    return bkk.toISOString().slice(0, 10);
+  }
   function formatDateLabel(iso) {
     const d = new Date(iso + "T00:00:00");
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const yest = new Date(today); yest.setDate(today.getDate() - 1);
-    if (iso === today.toISOString().slice(0, 10)) return "Today";
-    if (iso === yest.toISOString().slice(0, 10)) return "Yesterday";
-    return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    const todayStr = todayISO_GMT7();
+    const yestDate = new Date(todayStr + "T00:00:00");
+    yestDate.setDate(yestDate.getDate() - 1);
+    const yestStr = yestDate.toISOString().slice(0, 10);
+    const pretty = d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    if (iso === todayStr) return pretty + " (Today)";
+    if (iso === yestStr) return pretty + " (Yesterday)";
+    return pretty;
   }
 
   async function handleDelete(id) {
