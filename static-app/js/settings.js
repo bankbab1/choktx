@@ -49,7 +49,7 @@
 
     function html() {
       return `
-        <div class="sheet-backdrop" data-close>
+        <div class="sheet-backdrop">
           <div class="sheet" role="dialog" aria-modal="true">
             <div class="sheet-handle"><div class="sheet-grip"></div></div>
             <div class="sheet-header">
@@ -105,7 +105,7 @@
         setTimeout(() => { root.innerHTML = ""; document.body.style.overflow = prevOverflow; }, 220);
       }
 
-      backdrop.addEventListener("click", (e) => { if (e.target.closest("[data-close]") || e.target === backdrop) close(); });
+      backdrop.addEventListener("click", (e) => { if (e.target === backdrop || e.target.closest(".sheet-close")) close(); });
 
       root.querySelectorAll("[data-color]").forEach(b => b.addEventListener("click", () => {
         state.color = b.dataset.color;
@@ -251,7 +251,7 @@
     })();
 
     root.innerHTML = `
-      <div class="sheet-backdrop" data-close>
+      <div class="sheet-backdrop">
         <div class="sheet" role="dialog" aria-modal="true">
           <div class="sheet-handle"><div class="sheet-grip"></div></div>
           <div class="sheet-header">
@@ -285,7 +285,7 @@
       sheet.style.transform = "translateY(100%)";
       setTimeout(() => { root.innerHTML = ""; document.body.style.overflow = prevOverflow; }, 220);
     }
-    backdrop.addEventListener("click", (e) => { if (e.target.closest("[data-close]") || e.target === backdrop) close(); });
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop || e.target.closest(".sheet-close")) close(); });
 
     root.querySelectorAll("[data-picon]").forEach(b => b.addEventListener("click", () => {
       state.icon = b.dataset.picon;
