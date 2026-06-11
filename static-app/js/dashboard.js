@@ -152,4 +152,5 @@
 
   render();
   window.onExpenseSaved = render;
+  window.addEventListener("expenses-synced", render);
 })();

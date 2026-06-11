@@ -336,72 +336,41 @@
   renderPaid();
 })();
 
-// ===== Google Sheets Sync UI (TOTP login) =====
+// ===== Account status / Logout =====
 (function () {
   if (!window.Sync) return;
-  const urlEl = document.getElementById("gs-url");
-  const totpEl = document.getElementById("gs-totp");
   const statusEl = document.getElementById("gs-status");
-  if (!urlEl) return;
+  const logoutBtn = document.getElementById("gs-logout");
+  if (!statusEl || !logoutBtn) return;
 
-  urlEl.value = Sync.getCfg().url || "";
-
-  function setStatus(msg, kind) {
-    statusEl.textContent = msg;
-    statusEl.style.color = kind === "ok" ? "var(--success, #22c55e)"
-                         : kind === "err" ? "var(--danger, #ef4444)"
-                         : "var(--text-muted)";
-  }
-  function refreshStatus() {
+  function refresh() {
     if (Sync.loggedIn()) {
       const exp = new Date(Sync.sessionExp() * 1000).toLocaleString();
       const last = Sync.getLast();
-      setStatus(`Logged in until ${exp}` + (last ? ` · last sync ${new Date(last).toLocaleTimeString()}` : ""), "ok");
+      statusEl.textContent = `Logged in until ${exp}` + (last ? ` · last sync ${new Date(last).toLocaleTimeString()}` : "");
     } else {
-      setStatus("Not logged in");
+      statusEl.textContent = "Not logged in";
     }
   }
-  refreshStatus();
+  refresh();
 
-  document.getElementById("gs-login").addEventListener("click", async () => {
-    const code = (totpEl.value || "").trim();
-    if (!/^\d{6}$/.test(code)) { setStatus("Enter the 6-digit code", "err"); return; }
-    Sync.setCfg(Object.assign({}, Sync.getCfg(), { url: urlEl.value.trim() }));
-    setStatus("Logging in…");
-    try {
-      await Sync.login(code);
-      totpEl.value = "";
-      refreshStatus();
-    } catch (e) { setStatus("Login failed: " + e.message, "err"); }
-  });
-
-  document.getElementById("gs-logout").addEventListener("click", () => {
-    Sync.logout();
-    refreshStatus();
-  });
-
-  document.getElementById("gs-pull").addEventListener("click", async () => {
-    if (!Sync.loggedIn()) { setStatus("Login first", "err"); return; }
-    setStatus("Pulling current month…");
-    try {
-      const n = await Sync.pullCurrentMonth();
-      setStatus(`Pulled ${n} record(s) for this month`, "ok");
-    } catch (e) { setStatus("Pull failed: " + e.message, "err"); }
-  });
-
-  document.getElementById("gs-push").addEventListener("click", async () => {
-    if (!Sync.loggedIn()) { setStatus("Login first", "err"); return; }
+  logoutBtn.addEventListener("click", async () => {
     const ok = await window.confirmModal({
-      title: "Push all local records?",
-      message: "This appends every local record to your Google Sheet. Run this once when you first connect.",
-      confirmText: "Push",
+      title: "Log out?",
+      message: "You'll need your 6-digit code again to use the app.",
+      confirmText: "Logout",
+      danger: true,
     });
     if (!ok) return;
-    setStatus("Pushing…");
+    Sync.logout();
+    // Wipe local caches so the next login pulls fresh from Sheets.
     try {
-      const n = await Sync.pushAllLocal();
-      setStatus(`Pushed ${n} record(s)`, "ok");
-    } catch (e) { setStatus("Push failed: " + e.message, "err"); }
+      localStorage.removeItem("categories_v1");
+      localStorage.removeItem("paid_methods_v1");
+      localStorage.removeItem("expenses_v1");
+    } catch {}
+    location.reload();
   });
 })();
+
 

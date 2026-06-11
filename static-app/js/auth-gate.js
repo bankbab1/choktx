@@ -2,16 +2,45 @@
 (function () {
   if (!window.Sync) return;
 
-  // If already logged in but master data is missing locally (fresh device,
-  // cleared storage, etc.), silently pull it from Sheets so the UI isn't blank.
+  // Logged-in path: keep frontend in sync with Sheets in (near-)realtime.
+  //  - On every page load: pull master + current month from Sheets.
+  //  - On tab focus / visibility return: pull current month again.
+  //  - After a successful pull, dispatch `expenses-synced` so the page re-renders.
   if (Sync.loggedIn()) {
     const cats = window.Store && window.Store.getCategories && window.Store.getCategories();
     const paid = window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods();
-    if (!cats || !Object.keys(cats || {}).length || !Array.isArray(paid) || !paid.length) {
-      Sync.loadMasterIntoStore().then(() => location.reload()).catch(() => {});
+    const needMaster = !cats || !Object.keys(cats || {}).length || !Array.isArray(paid) || !paid.length;
+
+    async function syncFromSheets({ withMaster } = { withMaster: false }) {
+      try {
+        if (withMaster) await Sync.loadMasterIntoStore();
+        await Sync.pullCurrentMonth();
+        window.dispatchEvent(new CustomEvent("expenses-synced"));
+      } catch (e) { /* offline / expired session — leave local data alone */ }
     }
+
+    // First load: if master is missing we MUST reload after pulling, because
+    // categories.js has already captured an empty CATEGORIES object.
+    if (needMaster) {
+      Sync.loadMasterIntoStore()
+        .then(() => Sync.pullCurrentMonth().catch(() => {}))
+        .then(() => location.reload())
+        .catch(() => {});
+    } else {
+      syncFromSheets({ withMaster: false });
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && Sync.loggedIn()) {
+        syncFromSheets({ withMaster: false });
+      }
+    });
+    window.addEventListener("focus", () => {
+      if (Sync.loggedIn()) syncFromSheets({ withMaster: false });
+    });
     return;
   }
+
 
   const css = `
     .auth-gate-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);
