@@ -105,7 +105,11 @@
         setTimeout(() => { root.innerHTML = ""; document.body.style.overflow = prevOverflow; }, 220);
       }
 
-      backdrop.addEventListener("click", (e) => { if (e.target === backdrop || e.target.closest(".sheet-close")) close(); });
+      sheet.addEventListener("click", (e) => e.stopPropagation());
+      sheet.addEventListener("mousedown", (e) => e.stopPropagation());
+      sheet.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+      backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(); });
+      root.querySelectorAll(".sheet-close").forEach(b => b.addEventListener("click", close));
 
       root.querySelectorAll("[data-color]").forEach(b => b.addEventListener("click", () => {
         state.color = b.dataset.color;
