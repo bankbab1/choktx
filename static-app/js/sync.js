@@ -103,6 +103,41 @@
       setCfg(Object.assign({}, cfg, { session: data.session, exp: data.exp }));
       return data;
     },
+
+    // Pull `_categories`, `_subcategories`, `_paid_methods` from Sheets and
+    // write them into the frontend Store in the shape the UI expects.
+    async loadMasterIntoStore() {
+      const m = await call("loadMaster");
+      const cats = {};
+      (m.categories || []).forEach(r => {
+        const name = String(r.name || "").trim();
+        if (!name) return;
+        cats[name] = {
+          color: r.color || "#6366f1",
+          icon: r.icon || "tag",
+          sub: [],
+        };
+      });
+      (m.subcategories || []).forEach(r => {
+        const catName = String(r.category_name || "").trim();
+        const sub = String(r.name || "").trim();
+        if (!catName || !sub || !cats[catName]) return;
+        cats[catName].sub.push(sub);
+      });
+      const paid = (m.paid_methods || [])
+        .map(r => ({ name: String(r.name || "").trim(), icon: r.icon || "wallet" }))
+        .filter(p => p.name);
+
+      if (window.Store) {
+        window.Store.setCategories(cats);
+        window.Store.setPaidMethods(paid);
+      }
+      window.CATEGORIES = cats;
+      window.CATEGORY_NAMES = Object.keys(cats);
+      window.PAID_METHODS = paid;
+      return { categories: Object.keys(cats).length, paid_methods: paid.length };
+    },
+
     logout() {
       const cfg = getCfg();
       delete cfg.session; delete cfg.exp;
