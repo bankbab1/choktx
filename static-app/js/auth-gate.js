@@ -112,6 +112,20 @@
       }
     }
     btn.addEventListener("click", submit);
+    const pasteBtn = wrap.querySelector("#ag-paste");
+    pasteBtn.addEventListener("click", async () => {
+      try {
+        const txt = await navigator.clipboard.readText();
+        const digits = (txt || "").replace(/\D/g, "").slice(0, 6);
+        if (!digits) { msg.textContent = "Clipboard has no digits"; msg.className = "auth-gate-msg err"; return; }
+        input.value = digits;
+        if (digits.length === 6) submit();
+        else input.focus();
+      } catch (e) {
+        msg.textContent = "Paste blocked — long-press the field instead";
+        msg.className = "auth-gate-msg err";
+      }
+    });
     input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submit(); } });
     input.addEventListener("input", () => {
       input.value = input.value.replace(/\D/g, "").slice(0, 6);
