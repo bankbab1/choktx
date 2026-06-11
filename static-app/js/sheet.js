@@ -45,40 +45,37 @@
     function onKey(e) { if (e.key === "Escape") close(); }
     document.addEventListener("keydown", onKey);
 
+    // Prevent any document-level delegations (nav.js, etc.) from acting on
+    // clicks inside the sheet (e.g. data-edit / data-add lookalikes).
+    sheet.addEventListener("click", (e) => e.stopPropagation());
+    sheet.addEventListener("mousedown", (e) => e.stopPropagation());
+    sheet.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+
     backdrop.addEventListener("click", (e) => {
       if (e.target === backdrop) { close(); return; }
       const closeBtn = e.target.closest(".sheet-close");
       if (closeBtn && sheet.contains(closeBtn)) close();
     });
 
-    // Swipe-down to close (drag the handle area, or the sheet when scrolled to top)
-    let startY = 0, dragY = 0, dragging = false, body = root.querySelector(".sheet-body");
-    function onTouchStart(e) {
-      const t = e.touches[0];
-      // allow drag from handle always, or from body only if scrolled to top
-      if (e.currentTarget === body && body.scrollTop > 0) return;
-      dragging = true; startY = t.clientY; dragY = 0;
+    // Swipe-down to close — ONLY from the handle. Dragging from inputs/body
+    // was causing accidental closes while typing or scrolling.
+    let startY = 0, dragY = 0, dragging = false;
+    handle.addEventListener("touchstart", (e) => {
+      dragging = true; startY = e.touches[0].clientY; dragY = 0;
       sheet.style.transition = "none";
-    }
-    function onTouchMove(e) {
+    }, { passive: true });
+    handle.addEventListener("touchmove", (e) => {
       if (!dragging) return;
-      dragY = e.touches[0].clientY - startY;
-      if (dragY < 0) dragY = 0;
+      dragY = Math.max(0, e.touches[0].clientY - startY);
       sheet.style.transform = `translateY(${dragY}px)`;
-    }
-    function onTouchEnd() {
+    }, { passive: true });
+    handle.addEventListener("touchend", () => {
       if (!dragging) return;
       dragging = false;
       sheet.style.transition = "";
       if (dragY > 120) close();
       else sheet.style.transform = "";
-    }
-    handle.addEventListener("touchstart", onTouchStart, { passive: true });
-    handle.addEventListener("touchmove", onTouchMove, { passive: true });
-    handle.addEventListener("touchend", onTouchEnd);
-    body.addEventListener("touchstart", onTouchStart, { passive: true });
-    body.addEventListener("touchmove", onTouchMove, { passive: true });
-    body.addEventListener("touchend", onTouchEnd);
+    });
 
     window.initExpenseForm(host, {
       editId,
