@@ -1,7 +1,17 @@
 // Global TOTP login gate. Shows a modal on every page until logged in.
 (function () {
   if (!window.Sync) return;
-  if (Sync.loggedIn()) return;
+
+  // If already logged in but master data is missing locally (fresh device,
+  // cleared storage, etc.), silently pull it from Sheets so the UI isn't blank.
+  if (Sync.loggedIn()) {
+    const cats = window.Store && window.Store.getCategories && window.Store.getCategories();
+    const paid = window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods();
+    if (!cats || !Object.keys(cats || {}).length || !Array.isArray(paid) || !paid.length) {
+      Sync.loadMasterIntoStore().then(() => location.reload()).catch(() => {});
+    }
+    return;
+  }
 
   const css = `
     .auth-gate-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);
