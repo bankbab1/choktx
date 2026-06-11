@@ -16,14 +16,18 @@
   function getLast() { return localStorage.getItem(LAST_KEY) || ""; }
   function setLast(v) { localStorage.setItem(LAST_KEY, v); }
 
-  async function call(action, payload) {
+  function hasSession() {
+    const c = getCfg();
+    return !!(c.session && c.exp && Math.floor(Date.now()/1000) < Number(c.exp) - 30);
+  }
+
+  async function rawCall(body) {
     const cfg = getCfg();
-    if (!cfg.url || !cfg.token) throw new Error("Sync not configured");
-    // Apps Script /exec accepts text/plain to avoid CORS preflight
+    if (!cfg.url) throw new Error("Sync not configured");
     const res = await fetch(cfg.url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(Object.assign({ action, token: cfg.token }, payload || {})),
+      body: JSON.stringify(body),
       redirect: "follow",
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
@@ -31,6 +35,13 @@
     if (!data.ok) throw new Error(data.error || "Sync error");
     return data.data;
   }
+
+  async function call(action, payload) {
+    if (!hasSession()) throw new Error("Not logged in");
+    const cfg = getCfg();
+    return rawCall(Object.assign({ action, session: cfg.session }, payload || {}));
+  }
+
 
   function ymFromDate(d) {
     const s = String(d || "");
