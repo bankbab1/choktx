@@ -285,7 +285,7 @@
       sheet.style.transform = "translateY(100%)";
       setTimeout(() => { root.innerHTML = ""; document.body.style.overflow = prevOverflow; }, 220);
     }
-    backdrop.addEventListener("click", (e) => { if (e.target.closest("[data-close]") || e.target === backdrop) close(); });
+    backdrop.addEventListener("click", (e) => { if (e.target === backdrop || e.target.closest(".sheet-close")) close(); });
 
     root.querySelectorAll("[data-picon]").forEach(b => b.addEventListener("click", () => {
       state.icon = b.dataset.picon;
