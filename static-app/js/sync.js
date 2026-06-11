@@ -92,10 +92,25 @@
 
   // ===== Public API =====
   const Sync = {
-    getCfg, setCfg, getLast,
-    isConfigured() { const c = getCfg(); return !!(c.url && c.token); },
+    getCfg, setCfg, getLast, hasSession,
+    isConfigured() { return !!getCfg().url; },
+    loggedIn() { return hasSession(); },
+    sessionExp() { return Number(getCfg().exp || 0); },
+
+    async login(code) {
+      const data = await rawCall({ action: "login", code: String(code).trim() });
+      const cfg = getCfg();
+      setCfg(Object.assign({}, cfg, { session: data.session, exp: data.exp }));
+      return data;
+    },
+    logout() {
+      const cfg = getCfg();
+      delete cfg.session; delete cfg.exp;
+      setCfg(cfg);
+    },
 
     async ping()       { return call("ping"); },
+
     async loadMaster() { return call("loadMaster"); },
     async saveMaster(payload) { return call("saveMaster", payload); },
     async loadMonth(ym){ return call("loadMonth", { ym }); },
