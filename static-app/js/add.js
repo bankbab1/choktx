@@ -90,8 +90,11 @@
     const payCards = form.querySelectorAll('[data-f="pay"] .seg-card');
     const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
 
+    const { CATEGORIES, CATEGORY_NAMES } = currentCategories();
+    const paid = currentPaid();
+
     let paymentMethod = "Offline";
-    let paidBy = (window.PAID_METHODS && window.PAID_METHODS[0] && window.PAID_METHODS[0].name) || "Cash";
+    let paidBy = (paid[0] && paid[0].name) || "Cash";
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
