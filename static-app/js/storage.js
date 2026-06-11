@@ -21,7 +21,7 @@
       rec.updated_at = t;
       list.push(rec);
       write(list);
-      if (window.Sync && window.Sync.isConfigured()) {
+      if (window.Sync && window.Sync.hasSession()) {
         window.Sync.bgPush("appendRecord", { record: window.Sync._map.localToSheet(rec) });
       }
       return rec;
@@ -33,14 +33,14 @@
       const t = new Date().toISOString();
       list[i] = { ...list[i], ...patch, id, updated_at: t };
       write(list);
-      if (window.Sync && window.Sync.isConfigured()) {
+      if (window.Sync && window.Sync.hasSession()) {
         window.Sync.bgPush("updateRecord", { id, patch: window.Sync._map.localToSheet(list[i]) });
       }
       return list[i];
     },
     remove(id) {
       write(read().filter(r => r.id !== id));
-      if (window.Sync && window.Sync.isConfigured()) {
+      if (window.Sync && window.Sync.hasSession()) {
         window.Sync.bgPush("deleteRecord", { id });
       }
     },

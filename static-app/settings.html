@@ -61,20 +61,22 @@
           <input id="gs-url" type="url" placeholder="https://script.google.com/.../exec" autocomplete="off" />
         </div>
         <div class="field">
-          <label>Shared Token</label>
-          <input id="gs-token" type="password" placeholder="your SHARED_TOKEN" autocomplete="off" />
+          <label>6-digit code</label>
+          <input id="gs-totp" type="text" inputmode="numeric" autocomplete="one-time-code"
+                 pattern="[0-9]{6}" maxlength="6" placeholder="123456" />
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-sm" id="gs-save">Save</button>
-          <button class="btn-sm" id="gs-test">Test connection</button>
+          <button class="btn-sm" id="gs-login">Login</button>
+          <button class="btn-sm" id="gs-logout">Logout</button>
           <button class="btn-sm" id="gs-pull">Pull from Sheets</button>
           <button class="btn-sm" id="gs-push">Push to Sheets</button>
         </div>
-        <div class="setting-row-desc" id="gs-status" style="margin-top:10px">Not configured</div>
+        <div class="setting-row-desc" id="gs-status" style="margin-top:10px">Not logged in</div>
         <div class="setting-row-desc" style="margin-top:4px">
-          See <code>static-app/apps-script/README.md</code> for setup steps.
+          Get the code from Google Authenticator. See <code>apps-script/README.md</code> for setup.
         </div>
       </div>
+
 
       <div class="card">
         <div class="section-title">Categories</div>

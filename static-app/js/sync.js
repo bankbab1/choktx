@@ -16,14 +16,18 @@
   function getLast() { return localStorage.getItem(LAST_KEY) || ""; }
   function setLast(v) { localStorage.setItem(LAST_KEY, v); }
 
-  async function call(action, payload) {
+  function hasSession() {
+    const c = getCfg();
+    return !!(c.session && c.exp && Math.floor(Date.now()/1000) < Number(c.exp) - 30);
+  }
+
+  async function rawCall(body) {
     const cfg = getCfg();
-    if (!cfg.url || !cfg.token) throw new Error("Sync not configured");
-    // Apps Script /exec accepts text/plain to avoid CORS preflight
+    if (!cfg.url) throw new Error("Sync not configured");
     const res = await fetch(cfg.url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(Object.assign({ action, token: cfg.token }, payload || {})),
+      body: JSON.stringify(body),
       redirect: "follow",
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
@@ -31,6 +35,13 @@
     if (!data.ok) throw new Error(data.error || "Sync error");
     return data.data;
   }
+
+  async function call(action, payload) {
+    if (!hasSession()) throw new Error("Not logged in");
+    const cfg = getCfg();
+    return rawCall(Object.assign({ action, session: cfg.session }, payload || {}));
+  }
+
 
   function ymFromDate(d) {
     const s = String(d || "");
@@ -81,10 +92,25 @@
 
   // ===== Public API =====
   const Sync = {
-    getCfg, setCfg, getLast,
-    isConfigured() { const c = getCfg(); return !!(c.url && c.token); },
+    getCfg, setCfg, getLast, hasSession,
+    isConfigured() { return !!getCfg().url; },
+    loggedIn() { return hasSession(); },
+    sessionExp() { return Number(getCfg().exp || 0); },
+
+    async login(code) {
+      const data = await rawCall({ action: "login", code: String(code).trim() });
+      const cfg = getCfg();
+      setCfg(Object.assign({}, cfg, { session: data.session, exp: data.exp }));
+      return data;
+    },
+    logout() {
+      const cfg = getCfg();
+      delete cfg.session; delete cfg.exp;
+      setCfg(cfg);
+    },
 
     async ping()       { return call("ping"); },
+
     async loadMaster() { return call("loadMaster"); },
     async saveMaster(payload) { return call("saveMaster", payload); },
     async loadMonth(ym){ return call("loadMonth", { ym }); },
@@ -133,12 +159,13 @@
 
     // Fire-and-forget background push (called from Store after mutations)
     bgPush(action, payload) {
-      if (!this.isConfigured()) return;
-      Promise.resolve().then(() => call(action, payload)).then(
-        () => setLast(new Date().toISOString()),
-        () => {} // swallow; user can manually re-sync
-      );
+      if (!hasSession()) return;
+      const cfg = getCfg();
+      Promise.resolve().then(() =>
+        rawCall(Object.assign({ action, session: cfg.session }, payload || {}))
+      ).then(() => setLast(new Date().toISOString()), () => {});
     },
+
 
     _map: { localToSheet, sheetToLocal, ymFromDate, currentYM },
   };
