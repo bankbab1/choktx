@@ -1,12 +1,16 @@
 // Google Apps Script sync layer.
 // Talks to the Web App deployed from /static-app/apps-script/Code.gs
 (function () {
+  const DEFAULT_URL = "https://script.google.com/macros/s/AKfycbz43d6rquwzBvmo20coYknXAWF4Q9bZ4sRKh4RXLcVF6GDCSfmgYM2lmPt3HwW-9rCTUw/exec";
   const CFG_KEY = "gs_sync_cfg_v1";
   const LAST_KEY = "gs_sync_last_v1";
 
   function getCfg() {
-    try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; }
-    catch { return {}; }
+    try {
+      const c = JSON.parse(localStorage.getItem(CFG_KEY)) || {};
+      if (!c.url) c.url = DEFAULT_URL;
+      return c;
+    } catch { return { url: DEFAULT_URL }; }
   }
   function setCfg(cfg) { localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
   function getLast() { return localStorage.getItem(LAST_KEY) || ""; }
