@@ -49,7 +49,7 @@
 
     function html() {
       return `
-        <div class="sheet-backdrop" data-close>
+        <div class="sheet-backdrop">
           <div class="sheet" role="dialog" aria-modal="true">
             <div class="sheet-handle"><div class="sheet-grip"></div></div>
             <div class="sheet-header">
