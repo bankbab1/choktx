@@ -12,7 +12,22 @@
   };
   const ALL_PREFIXES = Object.values(PREFIX_MAP);
 
+  function currentCategories() {
+    const fromStore = (window.Store && window.Store.getCategories && window.Store.getCategories()) || null;
+    if (fromStore && Object.keys(fromStore).length) {
+      window.CATEGORIES = fromStore;
+      window.CATEGORY_NAMES = Object.keys(fromStore);
+    }
+    return { CATEGORIES: window.CATEGORIES || {}, CATEGORY_NAMES: window.CATEGORY_NAMES || [] };
+  }
+  function currentPaid() {
+    const fromStore = (window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods()) || null;
+    if (Array.isArray(fromStore) && fromStore.length) window.PAID_METHODS = fromStore;
+    return window.PAID_METHODS || [];
+  }
+
   window.expenseFormTemplate = function () {
+    const paid = currentPaid();
     return `
       <form class="expense-form" novalidate>
         <div class="field">
@@ -37,12 +52,13 @@
         <div class="field">
           <label>Paid By</label>
           <div class="seg-cards seg-cards-4" data-f="paidby">
-            ${(window.PAID_METHODS || []).map((m, i) => `
+            ${paid.map((m, i) => `
               <button type="button" class="seg-card ${i===0?"active":""}" data-paidby="${m.name.replace(/"/g,"&quot;")}">
                 <i data-lucide="${m.icon}"></i><span>${m.name}</span>
               </button>`).join("")}
           </div>
         </div>
+
         <div class="field">
           <label>Category</label>
           <select data-f="category" required></select>
@@ -74,8 +90,11 @@
     const payCards = form.querySelectorAll('[data-f="pay"] .seg-card');
     const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
 
+    const { CATEGORIES, CATEGORY_NAMES } = currentCategories();
+    const paid = currentPaid();
+
     let paymentMethod = "Offline";
-    let paidBy = (window.PAID_METHODS && window.PAID_METHODS[0] && window.PAID_METHODS[0].name) || "Cash";
+    let paidBy = (paid[0] && paid[0].name) || "Cash";
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
