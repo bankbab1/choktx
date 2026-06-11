@@ -53,6 +53,29 @@
         </div>
       </div>
 
+
+      <div class="card">
+        <div class="section-title">Google Sheets Sync</div>
+        <div class="field">
+          <label>Web App URL</label>
+          <input id="gs-url" type="url" placeholder="https://script.google.com/.../exec" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Shared Token</label>
+          <input id="gs-token" type="password" placeholder="your SHARED_TOKEN" autocomplete="off" />
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-sm" id="gs-save">Save</button>
+          <button class="btn-sm" id="gs-test">Test connection</button>
+          <button class="btn-sm" id="gs-pull">Pull from Sheets</button>
+          <button class="btn-sm" id="gs-push">Push to Sheets</button>
+        </div>
+        <div class="setting-row-desc" id="gs-status" style="margin-top:10px">Not configured</div>
+        <div class="setting-row-desc" style="margin-top:4px">
+          See <code>static-app/apps-script/README.md</code> for setup steps.
+        </div>
+      </div>
+
       <div class="card">
         <div class="section-title">Categories</div>
         <div id="cat-list"></div>
@@ -79,6 +102,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/sync.js"></script>
   <script src="js/categories.js"></script>
   <script src="js/paid-methods.js"></script>
   <script src="js/modal.js"></script>
