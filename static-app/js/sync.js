@@ -159,12 +159,13 @@
 
     // Fire-and-forget background push (called from Store after mutations)
     bgPush(action, payload) {
-      if (!this.isConfigured()) return;
-      Promise.resolve().then(() => call(action, payload)).then(
-        () => setLast(new Date().toISOString()),
-        () => {} // swallow; user can manually re-sync
-      );
+      if (!hasSession()) return;
+      const cfg = getCfg();
+      Promise.resolve().then(() =>
+        rawCall(Object.assign({ action, session: cfg.session }, payload || {}))
+      ).then(() => setLast(new Date().toISOString()), () => {});
     },
+
 
     _map: { localToSheet, sheetToLocal, ymFromDate, currentYM },
   };
