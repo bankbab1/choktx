@@ -23,9 +23,45 @@
     "#ef4444","#ec4899","#f97316","#84cc16","#14b8a6","#8b5cf6","#64748b"
   ];
 
+  function slugId(prefix, name) {
+    const s = String(name || "").toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    return prefix + (s || "x") + "_" + Math.random().toString(36).slice(2, 6);
+  }
+
+  // Build category + subcategory rows from the {name:{color,icon,sub:[]}} map
+  function serializeCategories(obj) {
+    const prev = (window.Store && window.Store.getCategoriesMeta && window.Store.getCategoriesMeta()) || {};
+    const categories = [];
+    const subcategories = [];
+    let i = 0;
+    Object.keys(obj).forEach(name => {
+      const m = obj[name] || {};
+      const prevMeta = prev[name] || {};
+      const id = prevMeta.id || slugId("cat_", name);
+      categories.push({ id, name, color: m.color || "#6366f1", icon: m.icon || "tag", sort_order: ++i, active: true });
+      (m.sub || []).forEach((sn, j) => {
+        const prevSub = (prevMeta.subIds && prevMeta.subIds[sn]) || null;
+        subcategories.push({
+          id: prevSub || slugId("sub_", sn),
+          category_id: id,
+          category_name: name,
+          name: sn,
+          sort_order: j + 1,
+          active: true,
+        });
+      });
+    });
+    return { categories, subcategories };
+  }
+
   window.saveCategories = function (obj) {
     window.Store.setCategories(obj);
     window.CATEGORIES = obj;
     window.CATEGORY_NAMES = Object.keys(obj);
+    // Push to Google Sheets master (background)
+    if (window.Sync && window.Sync.loggedIn && window.Sync.loggedIn()) {
+      const payload = serializeCategories(obj);
+      window.Sync.bgPush("saveMaster", payload);
+    }
   };
 })();
