@@ -28,8 +28,61 @@ Save the script (💾).
 - Type: **Time based**
 - Done. You'll now see a fresh 6-digit code every 30 seconds.
 
-## 4. Make sure the sheets have the right headers
-See the schema in the previous setup notes. Important: every monthly sheet (and `template`) must have an **`active`** column.
+## 4. Sheet schemas (REQUIRED — no defaults are bundled in the app)
+
+The app ships with **zero** mockup data. Every category, subcategory, and paid
+method must exist as a row in your master spreadsheet. Create these sheets in
+`personal_expense_app_record` with the exact header row shown (row 1):
+
+### `_categories`
+| id | name | color | icon | created_at | updated_at |
+|----|------|-------|------|------------|------------|
+| cat_fixed | Fixed Cost | #6366f1 | pin | | |
+| cat_daily | Daily Paid | #22c55e | utensils | | |
+| cat_onetime | One-Time Paid | #f59e0b | shopping-bag | | |
+| cat_parking | Parking Fee | #06b6d4 | square-parking | | |
+| cat_expressway | Express Way Fee | #0ea5e9 | milestone | | |
+| cat_invest | Invest | #a855f7 | trending-up | | |
+| cat_savings | Savings | #10b981 | piggy-bank | | |
+
+### `_subcategories`
+| id | category_id | category_name | name | created_at | updated_at |
+|----|-------------|---------------|------|------------|------------|
+| sub_phone | cat_fixed | Fixed Cost | Phone Bill | | |
+| sub_ai | cat_fixed | Fixed Cost | AI Subscription | | |
+| sub_food | cat_daily | Daily Paid | Food | | |
+| sub_drink | cat_daily | Daily Paid | Drink | | |
+| sub_dessert | cat_daily | Daily Paid | Dessert | | |
+| sub_bakery | cat_daily | Daily Paid | Bakery | | |
+| sub_snack | cat_daily | Daily Paid | Snack | | |
+| sub_fuel | cat_daily | Daily Paid | Fuel | | |
+| sub_lpg | cat_daily | Daily Paid | Lpg | | |
+| sub_crypto | cat_invest | Invest | Crypto | | |
+| sub_stock | cat_invest | Invest | Stock | | |
+
+`category_name` must match the `name` column in `_categories` exactly (case-sensitive).
+
+### `_paid_methods`
+| id | name | icon | created_at | updated_at |
+|----|------|------|------------|------------|
+| pm_cash | Cash | banknote | | |
+| pm_mobile | Mobile Banking | smartphone | | |
+| pm_credit | Credit | credit-card | | |
+| pm_spaylater | Spaylater | clock | | |
+
+### `_settings`
+Up to you — any `key` / `value` rows you like.
+
+### Monthly record sheets (e.g. `202506`) and `template`
+Must contain at minimum these headers (row 1):
+
+`id | date | time | amount | currency | category_id | category_name | subcategory_id | subcategory_name | channel | paid_method_id | paid_method_name | note | tags | source | created_at | updated_at | active`
+
+Every monthly sheet (and `template`) must have an **`active`** column — soft deletes set it to `false`.
+
+Leave `created_at` / `updated_at` blank on rows you paste manually; the server fills them on first write.
+
+
 
 ## 5. Deploy as Web App
 - **Deploy → New deployment → Web app**

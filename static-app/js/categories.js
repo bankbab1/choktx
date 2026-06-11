@@ -1,18 +1,12 @@
-// Category tree with lucide icon names (no emoji). Persisted via Store.
+// Category tree with lucide icon names (no emoji). Source of truth: Google Sheets.
 (function () {
-  const DEFAULTS = {
-    "Fixed Cost":      { color: "#6366f1", icon: "pin",            sub: ["Phone Bill", "AI Subscription"] },
-    "Daily Paid":      { color: "#22c55e", icon: "utensils",       sub: ["Food", "Drink", "Dessert", "Bakery", "Snack", "Fuel", "Lpg"] },
-    "One-Time Paid":   { color: "#f59e0b", icon: "shopping-bag",   sub: [] },
-    "Parking Fee":     { color: "#06b6d4", icon: "square-parking", sub: [] },
-    "Express Way Fee": { color: "#0ea5e9", icon: "milestone",      sub: [] },
-    "Invest":          { color: "#a855f7", icon: "trending-up",    sub: ["Crypto", "Stock"] },
-    "Savings":         { color: "#10b981", icon: "piggy-bank",     sub: [] },
-  };
+  // No mockup defaults. Categories come from the `_categories` / `_subcategories`
+  // sheets via Sync.loadMasterIntoStore() after login.
+  const DEFAULTS = {};
 
   function load() {
     const fromStore = window.Store && window.Store.getCategories && window.Store.getCategories();
-    return fromStore && Object.keys(fromStore).length ? fromStore : structuredClone(DEFAULTS);
+    return fromStore && Object.keys(fromStore).length ? fromStore : {};
   }
 
   window.CATEGORIES = load();

@@ -1,7 +1,17 @@
 // Global TOTP login gate. Shows a modal on every page until logged in.
 (function () {
   if (!window.Sync) return;
-  if (Sync.loggedIn()) return;
+
+  // If already logged in but master data is missing locally (fresh device,
+  // cleared storage, etc.), silently pull it from Sheets so the UI isn't blank.
+  if (Sync.loggedIn()) {
+    const cats = window.Store && window.Store.getCategories && window.Store.getCategories();
+    const paid = window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods();
+    if (!cats || !Object.keys(cats || {}).length || !Array.isArray(paid) || !paid.length) {
+      Sync.loadMasterIntoStore().then(() => location.reload()).catch(() => {});
+    }
+    return;
+  }
 
   const css = `
     .auth-gate-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);
@@ -52,12 +62,15 @@
       btn.disabled = true; msg.textContent = "Verifying…"; msg.className = "auth-gate-msg";
       try {
         await Sync.login(code);
+        msg.textContent = "Loading data…";
+        try { await Sync.loadMasterIntoStore(); } catch (e) { /* non-fatal */ }
+        try { await Sync.pullCurrentMonth(); } catch (e) { /* non-fatal */ }
         msg.textContent = "Unlocked"; msg.className = "auth-gate-msg ok";
         setTimeout(() => {
           wrap.remove();
           document.body.style.overflow = "";
-          // Refresh data on pages that fetch from Sheets
-          if (typeof window.onAuthReady === "function") try { window.onAuthReady(); } catch {}
+          // Reload so every page re-reads CATEGORIES / PAID_METHODS from Store.
+          location.reload();
         }, 300);
       } catch (e) {
         msg.textContent = "Login failed: " + e.message;
