@@ -342,6 +342,15 @@
 
   renderCats();
   renderPaid();
+
+  // Re-render when master data finishes loading from Google Sheets
+  window.addEventListener("expenses-synced", () => {
+    window.CATEGORIES = (window.Store.getCategories && window.Store.getCategories()) || {};
+    window.CATEGORY_NAMES = Object.keys(window.CATEGORIES);
+    window.PAID_METHODS = (window.Store.getPaidMethods && window.Store.getPaidMethods()) || [];
+    renderCats();
+    renderPaid();
+  });
 })();
 
 // ===== Account status / Logout =====
