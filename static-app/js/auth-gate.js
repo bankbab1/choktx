@@ -62,12 +62,15 @@
       btn.disabled = true; msg.textContent = "Verifying…"; msg.className = "auth-gate-msg";
       try {
         await Sync.login(code);
+        msg.textContent = "Loading data…";
+        try { await Sync.loadMasterIntoStore(); } catch (e) { /* non-fatal */ }
+        try { await Sync.pullCurrentMonth(); } catch (e) { /* non-fatal */ }
         msg.textContent = "Unlocked"; msg.className = "auth-gate-msg ok";
         setTimeout(() => {
           wrap.remove();
           document.body.style.overflow = "";
-          // Refresh data on pages that fetch from Sheets
-          if (typeof window.onAuthReady === "function") try { window.onAuthReady(); } catch {}
+          // Reload so every page re-reads CATEGORIES / PAID_METHODS from Store.
+          location.reload();
         }, 300);
       } catch (e) {
         msg.textContent = "Login failed: " + e.message;
