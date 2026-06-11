@@ -21,8 +21,8 @@
           </div>
         </div>
         <div class="cat-editor-actions">
-          <button data-edit="${escapeAttr(name)}" aria-label="Edit"><i data-lucide="pencil"></i></button>
-          <button class="danger" data-del="${escapeAttr(name)}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
+          <button data-cat-edit="${escapeAttr(name)}" aria-label="Edit"><i data-lucide="pencil"></i></button>
+          <button class="danger" data-cat-del="${escapeAttr(name)}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
         </div>`;
       catList.appendChild(row);
     });
