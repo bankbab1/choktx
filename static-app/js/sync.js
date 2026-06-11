@@ -109,6 +109,7 @@
     async loadMasterIntoStore() {
       const m = await call("loadMaster");
       const cats = {};
+      const catMeta = {}; // name -> { id, subIds: { subName: id } }
       (m.categories || []).forEach(r => {
         const name = String(r.name || "").trim();
         if (!name) return;
@@ -117,20 +118,26 @@
           icon: r.icon || "tag",
           sub: [],
         };
+        catMeta[name] = { id: String(r.id || ""), subIds: {} };
       });
       (m.subcategories || []).forEach(r => {
         const catName = String(r.category_name || "").trim();
         const sub = String(r.name || "").trim();
         if (!catName || !sub || !cats[catName]) return;
         cats[catName].sub.push(sub);
+        catMeta[catName].subIds[sub] = String(r.id || "");
       });
       const paid = (m.paid_methods || [])
-        .map(r => ({ name: String(r.name || "").trim(), icon: r.icon || "wallet" }))
+        .map(r => ({ name: String(r.name || "").trim(), icon: r.icon || "wallet", _id: String(r.id || "") }))
         .filter(p => p.name);
+      const paidMeta = {};
+      paid.forEach(p => { paidMeta[p.name] = { id: p._id }; delete p._id; });
 
       if (window.Store) {
         window.Store.setCategories(cats);
         window.Store.setPaidMethods(paid);
+        if (window.Store.setCategoriesMeta) window.Store.setCategoriesMeta(catMeta);
+        if (window.Store.setPaidMethodsMeta) window.Store.setPaidMethodsMeta(paidMeta);
       }
       window.CATEGORIES = cats;
       window.CATEGORY_NAMES = Object.keys(cats);
