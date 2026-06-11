@@ -1,63 +1,49 @@
-# Google Apps Script Setup (5 min)
+# Google Apps Script Setup (TOTP auth)
 
 ## 1. Open the script editor
-Open **personal_expense_app_record** in Google Sheets → **Extensions → Apps Script**.
+Open **personal_expense_app_record** → **Extensions → Apps Script** → paste the contents of [`Code.gs`](./Code.gs).
 
-## 2. Paste the code
-- Delete the default `Code.gs` contents
-- Paste everything from [`Code.gs`](./Code.gs)
-- At the top of the file, set:
-  - `MASTER_ID` → already set to your master spreadsheet ID
-  - `SHARED_TOKEN` → **change to a long random string** (e.g. run `crypto.randomUUID()` in browser console). Keep this private — it's your API key.
+## 2. Generate two secrets
 
-## 3. Make sure your sheets have these header rows
-
-### `personal_expense_app_master`
-
-**_categories** (row 1):
+**a) `TOTP_SECRET`** — base32 only (A–Z and 2–7). Run in browser DevTools:
+```js
+Array.from(crypto.getRandomValues(new Uint8Array(20)))
+  .map(b => "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"[b%32]).join('')
 ```
-id | name | color | icon | sort_order | active | created_at | updated_at
-```
+Copy the result into `TOTP_SECRET` in `Code.gs`.
 
-**_subcategories** (row 1):
+**b) `SESSION_SECRET`** — any long random string. Run:
+```js
+crypto.randomUUID() + crypto.randomUUID()
 ```
-id | category_id | name | sort_order | active | created_at | updated_at
-```
+Paste into `SESSION_SECRET`.
 
-**_paid_methods** (row 1):
-```
-id | name | icon | sort_order | active | created_at | updated_at
-```
+Save the script (💾).
 
-**_settings** (row 1):
-```
-currency | theme | schema_version | updated_at
-```
+## 3. Add the TOTP secret to Google Authenticator
+- Open **Google Authenticator** (or Authy, 1Password, etc.)
+- Add account → **Enter setup key**
+- Account: `Expense Tracker`
+- Key: paste your `TOTP_SECRET`
+- Type: **Time based**
+- Done. You'll now see a fresh 6-digit code every 30 seconds.
 
-### `personal_expense_app_record`
+## 4. Make sure the sheets have the right headers
+See the schema in the previous setup notes. Important: every monthly sheet (and `template`) must have an **`active`** column.
 
-**template** and every monthly sheet (e.g. `202606`) row 1:
-```
-id | date | time | amount | currency | category_id | category_name | subcategory_id | subcategory_name | channel | paid_method_id | paid_method_name | note | tags | source | created_at | updated_at | active
-```
+## 5. Deploy as Web App
+- **Deploy → New deployment → Web app**
+- Execute as: **Me**
+- Who has access: **Anyone**
+- Deploy → grant permissions → copy the **/exec** URL.
 
-> ⚠️ Add the `active` column (column R) to your `template` and `202606` sheets if you haven't yet — it's required for soft-delete.
+(The URL is already hardcoded in `static-app/js/sync.js`. If you redeploy to a new URL, paste it into Settings → Web App URL.)
 
-## 4. Deploy as Web App
-1. Click **Deploy → New deployment**
-2. Gear icon → **Web app**
-3. Description: `Expense Tracker API v1`
-4. Execute as: **Me (your account)**
-5. Who has access: **Anyone**  *(don't worry — the SHARED_TOKEN protects it)*
-6. **Deploy** → grant permissions when prompted
-7. Copy the **Web app URL** (ends in `/exec`)
-
-## 5. Wire it into the app
-Open the app → **Settings → Google Sheets Sync**:
-- Paste the **Web app URL**
-- Paste the same **SHARED_TOKEN**
-- Tap **Test connection** → should say *Connected*
-- Tap **Pull from Sheets** to import existing data, or **Push to Sheets** to upload local data
+## 6. Log in from the app
+- Open the app → **Settings → Google Sheets Sync**
+- Open Google Authenticator → copy the 6-digit code for "Expense Tracker"
+- Paste into the app → **Login**
+- You're logged in for 8 hours. After that, repeat steps 1 line of this section.
 
 ## Updating the script later
-Edit the code → **Deploy → Manage deployments** → pencil icon on the existing deployment → **Version: New version** → Deploy. The URL stays the same.
+Edit → **Deploy → Manage deployments → ✏️ → Version: New version → Deploy**. URL stays the same.
