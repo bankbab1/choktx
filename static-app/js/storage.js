@@ -16,19 +16,34 @@
     add(rec) {
       const list = read();
       rec.id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const t = new Date().toISOString();
+      rec.created_at = rec.created_at || t;
+      rec.updated_at = t;
       list.push(rec);
       write(list);
+      if (window.Sync && window.Sync.isConfigured()) {
+        window.Sync.bgPush("appendRecord", { record: window.Sync._map.localToSheet(rec) });
+      }
       return rec;
     },
     update(id, patch) {
       const list = read();
       const i = list.findIndex(r => r.id === id);
       if (i === -1) return null;
-      list[i] = { ...list[i], ...patch, id };
+      const t = new Date().toISOString();
+      list[i] = { ...list[i], ...patch, id, updated_at: t };
       write(list);
+      if (window.Sync && window.Sync.isConfigured()) {
+        window.Sync.bgPush("updateRecord", { id, patch: window.Sync._map.localToSheet(list[i]) });
+      }
       return list[i];
     },
-    remove(id) { write(read().filter(r => r.id !== id)); },
+    remove(id) {
+      write(read().filter(r => r.id !== id));
+      if (window.Sync && window.Sync.isConfigured()) {
+        window.Sync.bgPush("deleteRecord", { id });
+      }
+    },
     clear() { localStorage.removeItem(KEY); },
     exportJSON() { return JSON.stringify(read(), null, 2); },
     importJSON(text) {
