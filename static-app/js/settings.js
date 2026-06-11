@@ -335,3 +335,61 @@
   renderCats();
   renderPaid();
 })();
+
+// ===== Google Sheets Sync UI =====
+(function () {
+  if (!window.Sync) return;
+  const urlEl = document.getElementById("gs-url");
+  const tokEl = document.getElementById("gs-token");
+  const statusEl = document.getElementById("gs-status");
+  if (!urlEl) return;
+
+  const cfg = Sync.getCfg();
+  urlEl.value = cfg.url || "";
+  tokEl.value = cfg.token || "";
+
+  function setStatus(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.style.color = kind === "ok" ? "var(--success, #22c55e)"
+                         : kind === "err" ? "var(--danger, #ef4444)"
+                         : "var(--text-muted)";
+  }
+  if (Sync.isConfigured()) {
+    const last = Sync.getLast();
+    setStatus(last ? `Configured · last sync ${new Date(last).toLocaleString()}` : "Configured");
+  }
+
+  document.getElementById("gs-save").addEventListener("click", () => {
+    Sync.setCfg({ url: urlEl.value.trim(), token: tokEl.value.trim() });
+    setStatus("Saved", "ok");
+  });
+
+  document.getElementById("gs-test").addEventListener("click", async () => {
+    Sync.setCfg({ url: urlEl.value.trim(), token: tokEl.value.trim() });
+    setStatus("Testing…");
+    try { await Sync.ping(); setStatus("Connected ✓", "ok"); }
+    catch (e) { setStatus("Failed: " + e.message, "err"); }
+  });
+
+  document.getElementById("gs-pull").addEventListener("click", async () => {
+    setStatus("Pulling current month…");
+    try {
+      const n = await Sync.pullCurrentMonth();
+      setStatus(`Pulled ${n} record(s) for this month`, "ok");
+    } catch (e) { setStatus("Pull failed: " + e.message, "err"); }
+  });
+
+  document.getElementById("gs-push").addEventListener("click", async () => {
+    const ok = await window.confirmModal({
+      title: "Push all local records?",
+      message: "This appends every local record to your Google Sheet. Run this once when you first connect.",
+      confirmText: "Push",
+    });
+    if (!ok) return;
+    setStatus("Pushing…");
+    try {
+      const n = await Sync.pushAllLocal();
+      setStatus(`Pushed ${n} record(s)`, "ok");
+    } catch (e) { setStatus("Push failed: " + e.message, "err"); }
+  });
+})();
