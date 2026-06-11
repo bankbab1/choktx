@@ -21,8 +21,8 @@
           </div>
         </div>
         <div class="cat-editor-actions">
-          <button data-edit="${escapeAttr(name)}" aria-label="Edit"><i data-lucide="pencil"></i></button>
-          <button class="danger" data-del="${escapeAttr(name)}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
+          <button data-cat-edit="${escapeAttr(name)}" aria-label="Edit"><i data-lucide="pencil"></i></button>
+          <button class="danger" data-cat-del="${escapeAttr(name)}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
         </div>`;
       catList.appendChild(row);
     });
@@ -169,11 +169,12 @@
   }
 
   catList.addEventListener("click", async (e) => {
-    const edit = e.target.closest("[data-edit]");
-    const del = e.target.closest("[data-del]");
-    if (edit) openCategoryEditor(edit.dataset.edit);
+    const edit = e.target.closest("[data-cat-edit]");
+    const del = e.target.closest("[data-cat-del]");
+    if (edit) { e.stopPropagation(); openCategoryEditor(edit.dataset.catEdit); }
     if (del) {
-      const name = del.dataset.del;
+      e.stopPropagation();
+      const name = del.dataset.catDel;
       const ok = await window.confirmModal({
         title: `Delete "${name}"?`,
         message: "Existing records keep their category label, but it will no longer appear in the picker.",
