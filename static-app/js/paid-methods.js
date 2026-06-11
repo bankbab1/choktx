@@ -1,15 +1,11 @@
-// Paid-by methods: defaults + persistence. Each: { name, icon }.
+// Paid-by methods. Source of truth: Google Sheets `_paid_methods`.
 (function () {
-  const DEFAULTS = [
-    { name: "Cash",           icon: "banknote" },
-    { name: "Mobile Banking", icon: "smartphone" },
-    { name: "Credit",         icon: "credit-card" },
-    { name: "Spaylater",      icon: "clock" },
-  ];
+  // No mockup defaults. Loaded via Sync.loadMasterIntoStore() after login.
+  const DEFAULTS = [];
 
   function load() {
     const fromStore = window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods();
-    return Array.isArray(fromStore) && fromStore.length ? fromStore : structuredClone(DEFAULTS);
+    return Array.isArray(fromStore) && fromStore.length ? fromStore : [];
   }
 
   window.PAID_METHODS = load();
