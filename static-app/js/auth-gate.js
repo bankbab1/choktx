@@ -56,6 +56,8 @@
       background:var(--surface-2,#f5f5f5);color:var(--text,#111);box-sizing:border-box}
     .auth-gate-card button{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;
       background:var(--accent,#3b82f6);color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+    .auth-gate-card button.ghost{background:var(--surface-2,#f5f5f5);color:var(--text,#111);
+      border:1px solid var(--border,#ddd)}
     .auth-gate-card button:disabled{opacity:.6;cursor:not-allowed}
     .auth-gate-msg{min-height:18px;margin-top:10px;font-size:13px}
     .auth-gate-msg.err{color:#ef4444}
@@ -73,6 +75,7 @@
       <p>Enter the 6-digit code from your Authenticator app.</p>
       <input id="ag-code" type="text" inputmode="numeric" autocomplete="one-time-code"
              pattern="[0-9]{6}" maxlength="6" placeholder="••••••" />
+      <button id="ag-paste" class="ghost" type="button">📋 Paste code</button>
       <button id="ag-submit">Unlock</button>
       <div class="auth-gate-msg" id="ag-msg"></div>
     </div>`;
@@ -109,6 +112,20 @@
       }
     }
     btn.addEventListener("click", submit);
+    const pasteBtn = wrap.querySelector("#ag-paste");
+    pasteBtn.addEventListener("click", async () => {
+      try {
+        const txt = await navigator.clipboard.readText();
+        const digits = (txt || "").replace(/\D/g, "").slice(0, 6);
+        if (!digits) { msg.textContent = "Clipboard has no digits"; msg.className = "auth-gate-msg err"; return; }
+        input.value = digits;
+        if (digits.length === 6) submit();
+        else input.focus();
+      } catch (e) {
+        msg.textContent = "Paste blocked — long-press the field instead";
+        msg.className = "auth-gate-msg err";
+      }
+    });
     input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submit(); } });
     input.addEventListener("input", () => {
       input.value = input.value.replace(/\D/g, "").slice(0, 6);
