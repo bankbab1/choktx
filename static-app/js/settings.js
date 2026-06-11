@@ -336,17 +336,15 @@
   renderPaid();
 })();
 
-// ===== Google Sheets Sync UI =====
+// ===== Google Sheets Sync UI (TOTP login) =====
 (function () {
   if (!window.Sync) return;
   const urlEl = document.getElementById("gs-url");
-  const tokEl = document.getElementById("gs-token");
+  const totpEl = document.getElementById("gs-totp");
   const statusEl = document.getElementById("gs-status");
   if (!urlEl) return;
 
-  const cfg = Sync.getCfg();
-  urlEl.value = cfg.url || "";
-  tokEl.value = cfg.token || "";
+  urlEl.value = Sync.getCfg().url || "";
 
   function setStatus(msg, kind) {
     statusEl.textContent = msg;
@@ -354,24 +352,36 @@
                          : kind === "err" ? "var(--danger, #ef4444)"
                          : "var(--text-muted)";
   }
-  if (Sync.isConfigured()) {
-    const last = Sync.getLast();
-    setStatus(last ? `Configured · last sync ${new Date(last).toLocaleString()}` : "Configured");
+  function refreshStatus() {
+    if (Sync.loggedIn()) {
+      const exp = new Date(Sync.sessionExp() * 1000).toLocaleString();
+      const last = Sync.getLast();
+      setStatus(`Logged in until ${exp}` + (last ? ` · last sync ${new Date(last).toLocaleTimeString()}` : ""), "ok");
+    } else {
+      setStatus("Not logged in");
+    }
   }
+  refreshStatus();
 
-  document.getElementById("gs-save").addEventListener("click", () => {
-    Sync.setCfg({ url: urlEl.value.trim(), token: tokEl.value.trim() });
-    setStatus("Saved", "ok");
+  document.getElementById("gs-login").addEventListener("click", async () => {
+    const code = (totpEl.value || "").trim();
+    if (!/^\d{6}$/.test(code)) { setStatus("Enter the 6-digit code", "err"); return; }
+    Sync.setCfg(Object.assign({}, Sync.getCfg(), { url: urlEl.value.trim() }));
+    setStatus("Logging in…");
+    try {
+      await Sync.login(code);
+      totpEl.value = "";
+      refreshStatus();
+    } catch (e) { setStatus("Login failed: " + e.message, "err"); }
   });
 
-  document.getElementById("gs-test").addEventListener("click", async () => {
-    Sync.setCfg({ url: urlEl.value.trim(), token: tokEl.value.trim() });
-    setStatus("Testing…");
-    try { await Sync.ping(); setStatus("Connected ✓", "ok"); }
-    catch (e) { setStatus("Failed: " + e.message, "err"); }
+  document.getElementById("gs-logout").addEventListener("click", () => {
+    Sync.logout();
+    refreshStatus();
   });
 
   document.getElementById("gs-pull").addEventListener("click", async () => {
+    if (!Sync.loggedIn()) { setStatus("Login first", "err"); return; }
     setStatus("Pulling current month…");
     try {
       const n = await Sync.pullCurrentMonth();
@@ -380,6 +390,7 @@
   });
 
   document.getElementById("gs-push").addEventListener("click", async () => {
+    if (!Sync.loggedIn()) { setStatus("Login first", "err"); return; }
     const ok = await window.confirmModal({
       title: "Push all local records?",
       message: "This appends every local record to your Google Sheet. Run this once when you first connect.",
@@ -393,3 +404,4 @@
     } catch (e) { setStatus("Push failed: " + e.message, "err"); }
   });
 })();
+
