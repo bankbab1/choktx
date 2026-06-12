@@ -213,6 +213,32 @@
       return incoming.length;
     },
 
+    // Pull every month of the current calendar year so Stats "Year" is complete.
+    async pullYearToDate() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const upto = now.getMonth() + 1; // 1..12
+      const yms = [];
+      for (let m = 1; m <= upto; m++) yms.push(y + String(m).padStart(2, "0"));
+      const res = await this.loadMonths(yms);
+      // res shape: { months: { "202601": { rows: [...] }, ... } } OR { "202601": [...] }
+      const monthsObj = (res && (res.months || res)) || {};
+      const local = (window.Store && window.Store.all && window.Store.all()) || [];
+      const kept = local.filter(r => {
+        const ym = ymFromDate(r.date);
+        return !yms.includes(ym);
+      });
+      let incoming = [];
+      yms.forEach(ym => {
+        const v = monthsObj[ym];
+        const rows = Array.isArray(v) ? v : (v && v.rows) || [];
+        incoming = incoming.concat(rows.map(sheetToLocal));
+      });
+      localStorage.setItem("expenses_v1", JSON.stringify(kept.concat(incoming)));
+      setLast(new Date().toISOString());
+      return incoming.length;
+    },
+
     // Push every local record up (skip ones that look already synced via updated_at)
     async pushAllLocal() {
       const local = (window.Store && window.Store.all && window.Store.all()) || [];
