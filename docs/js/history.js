@@ -3,6 +3,7 @@
   const emptyEl = document.getElementById("empty");
   const filterCat = document.getElementById("filter-cat");
   const filterPeriod = document.getElementById("filter-period");
+  const filterSearch = document.getElementById("filter-search");
   const rangeRow = document.getElementById("range-row");
   const rangeFrom = document.getElementById("range-from");
   const rangeTo = document.getElementById("range-to");
@@ -57,14 +58,20 @@
     const start = startOf(period);
     const from = period === "custom" && rangeFrom.value ? rangeFrom.value : null;
     const to = period === "custom" && rangeTo.value ? rangeTo.value : null;
+    const q = (filterSearch.value || "").trim().toLowerCase();
+    const qNum = q && !isNaN(parseFloat(q.replace(/,/g, ""))) ? parseFloat(q.replace(/,/g, "")) : null;
     const rows = Store.all().filter(r => {
       if (cat && r.category !== cat) return false;
       if (period === "custom") {
         if (from && r.date < from) return false;
         if (to && r.date > to) return false;
-        return true;
+      } else if (new Date(r.date) < start) return false;
+      if (q) {
+        const hay = `${r.description || ""} ${r.category || ""} ${r.subcategory || ""} ${r.date || ""}`.toLowerCase();
+        const costStr = String(r.cost);
+        if (!hay.includes(q) && !costStr.includes(q) && (qNum === null || Number(r.cost) !== qNum)) return false;
       }
-      return new Date(r.date) >= start;
+      return true;
     });
     listEl.innerHTML = "";
     emptyEl.style.display = rows.length ? "none" : "block";
@@ -109,6 +116,7 @@
     }
   }
   filterCat.addEventListener("change", render);
+  filterSearch.addEventListener("input", render);
   filterPeriod.addEventListener("change", render);
   rangeFrom.addEventListener("change", () => { syncRangeBounds(); render(); });
   rangeTo.addEventListener("change", () => { syncRangeBounds(); render(); });
