@@ -51,10 +51,20 @@
     sheet.addEventListener("mousedown", (e) => e.stopPropagation());
     sheet.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
 
+    // Prevent any document-level delegations (nav.js, etc.) from acting on
+    // clicks inside the sheet (e.g. data-edit / data-add lookalikes).
+    sheet.addEventListener("click", (e) => e.stopPropagation());
+    sheet.addEventListener("mousedown", (e) => e.stopPropagation());
+    sheet.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+
+    // Bind close button directly — the stopPropagation above prevents the
+    // backdrop's delegated handler from ever seeing the click.
+    root.querySelectorAll(".sheet-close").forEach((btn) => {
+      btn.addEventListener("click", (e) => { e.preventDefault(); close(); });
+    });
+
     backdrop.addEventListener("click", (e) => {
-      if (e.target === backdrop) { close(); return; }
-      const closeBtn = e.target.closest(".sheet-close");
-      if (closeBtn && sheet.contains(closeBtn)) close();
+      if (e.target === backdrop) close();
     });
 
     // Swipe-down to close — ONLY from the handle. Dragging from inputs/body
