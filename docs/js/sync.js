@@ -80,19 +80,24 @@
 
   // ===== Mapping: local record <-> sheet row =====
   function localToSheet(r) {
+    // Look up master ids so the sheet gets correct category/subcategory/paid ids.
+    const catMeta = (window.Store && window.Store.getCategoriesMeta && window.Store.getCategoriesMeta()) || {};
+    const paidMeta = (window.Store && window.Store.getPaidMethodsMeta && window.Store.getPaidMethodsMeta()) || {};
+    const cm = catMeta[r.category] || {};
+    const paidName = r.paidBy || r.paidby || "";
     return {
       id: r.id,
       date: r.date,
       time: r.time || "",
       amount: Number(r.cost) || 0,
       currency: r.currency || "",
-      category_id: r.category_id || "",
+      category_id: r.category_id || cm.id || "",
       category_name: r.category || "",
-      subcategory_id: r.subcategory_id || "",
+      subcategory_id: r.subcategory_id || (cm.subIds && r.subcategory && cm.subIds[r.subcategory]) || "",
       subcategory_name: r.subcategory || "",
       channel: r.pay || "",
-      paid_method_id: r.paid_method_id || "",
-      paid_method_name: r.paidby || "",
+      paid_method_id: r.paid_method_id || (paidMeta[paidName] && paidMeta[paidName].id) || "",
+      paid_method_name: paidName,
       note: r.description || "",
       tags: Array.isArray(r.tags) ? r.tags.join(",") : (r.tags || ""),
       source: "app",
@@ -107,7 +112,7 @@
       date: toYMD(r.date),
       cost: Number(r.amount) || 0,
       pay: r.channel || "",
-      paidby: r.paid_method_name || "",
+      paidBy: r.paid_method_name || "",
       category: fixName(r.category_name),
       subcategory: fixName(r.subcategory_name),
       description: r.note || "",
