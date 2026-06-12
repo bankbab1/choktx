@@ -1,9 +1,7 @@
 // Expense form, usable as full page OR bottom sheet via initExpenseForm(root, opts).
 (function () {
   function todayGMT7() {
-    const d = new Date();
-    const bkk = new Date(d.getTime() + (d.getTimezoneOffset() + 420) * 60000);
-    return bkk.toISOString().slice(0, 10);
+    return TZ.todayStr();
   }
 
   const PREFIX_MAP = {
