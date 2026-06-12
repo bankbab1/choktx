@@ -52,6 +52,32 @@
     return d.getFullYear() + String(d.getMonth()+1).padStart(2,"0");
   }
 
+  // Google Sheets sometimes auto-parses cells as Date (e.g. the date column,
+  // or a subcategory typed as "7-11"). Apps Script returns those as Date
+  // objects which JSON-serialize to UTC ISO strings — shifting one day back
+  // in Asia/Bangkok (UTC+7). Re-interpret in Bangkok time.
+  const ISO_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/;
+  function bangkokFromISO(s) {
+    if (!ISO_RE.test(String(s || ""))) return null;
+    const d = new Date(s);
+    if (isNaN(d)) return null;
+    return new Date(d.getTime() + 7 * 3600 * 1000);
+  }
+  function toYMD(v) {
+    const s = String(v || "");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    const bk = bangkokFromISO(s);
+    return bk ? bk.toISOString().slice(0, 10) : s.slice(0, 10);
+  }
+  // If a master "name" cell comes back as an ISO datetime, Sheets parsed the
+  // user's text as a date (e.g. "7-11" -> 2026-07-11). Re-render as "M-D".
+  function fixName(v) {
+    const s = String(v == null ? "" : v).trim();
+    const bk = bangkokFromISO(s);
+    if (!bk) return s;
+    return (bk.getUTCMonth() + 1) + "-" + bk.getUTCDate();
+  }
+
   // ===== Mapping: local record <-> sheet row =====
   function localToSheet(r) {
     return {
@@ -78,12 +104,12 @@
   function sheetToLocal(r) {
     return {
       id: String(r.id),
-      date: String(r.date || "").slice(0,10),
+      date: toYMD(r.date),
       cost: Number(r.amount) || 0,
       pay: r.channel || "",
       paidby: r.paid_method_name || "",
-      category: r.category_name || "",
-      subcategory: r.subcategory_name || "",
+      category: fixName(r.category_name),
+      subcategory: fixName(r.subcategory_name),
       description: r.note || "",
       created_at: r.created_at || "",
       updated_at: r.updated_at || "",
@@ -111,7 +137,7 @@
       const cats = {};
       const catMeta = {}; // name -> { id, subIds: { subName: id } }
       (m.categories || []).forEach(r => {
-        const name = String(r.name || "").trim();
+        const name = fixName(r.name);
         if (!name) return;
         cats[name] = {
           color: r.color || "#6366f1",
@@ -121,8 +147,8 @@
         catMeta[name] = { id: String(r.id || ""), subIds: {} };
       });
       (m.subcategories || []).forEach(r => {
-        const catName = String(r.category_name || "").trim();
-        const sub = String(r.name || "").trim();
+        const catName = fixName(r.category_name);
+        const sub = fixName(r.name);
         if (!catName || !sub || !cats[catName]) return;
         cats[catName].sub.push(sub);
         catMeta[catName].subIds[sub] = String(r.id || "");
