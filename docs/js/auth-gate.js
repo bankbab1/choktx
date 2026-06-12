@@ -56,7 +56,7 @@
       sessionStorage.setItem("master_boot_attempted", "1");
       const before = snapshot();
       Sync.loadMasterIntoStore()
-        .then(() => Sync.pullCurrentMonth().catch(() => {}))
+        .then(() => (Sync.pullYearToDate ? Sync.pullYearToDate() : Sync.pullCurrentMonth()).catch(() => {}))
         .then(() => {
           if (snapshot() !== before && !uiBusy()) {
             window.dispatchEvent(new CustomEvent("expenses-synced"));
