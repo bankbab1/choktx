@@ -38,7 +38,8 @@
       const before = snapshot();
       try {
         if (withMaster) await Sync.loadMasterIntoStore();
-        await Sync.pullCurrentMonth();
+        if (Sync.pullYearToDate) await Sync.pullYearToDate();
+        else await Sync.pullCurrentMonth();
         if (snapshot() !== before && !uiBusy()) {
           window.dispatchEvent(new CustomEvent("expenses-synced"));
         }
