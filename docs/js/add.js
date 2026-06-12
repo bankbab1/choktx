@@ -39,17 +39,7 @@
           <input data-f="cost" class="cost-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" required />
         </div>
         <div class="field">
-          <label>Payment Method</label>
-          <div class="seg-cards" data-f="pay">
-            <button type="button" class="seg-card active" data-pay="Offline">
-              <i data-lucide="wallet"></i><span>Offline</span>
-            </button>
-            <button type="button" class="seg-card" data-pay="Online">
-              <i data-lucide="credit-card"></i><span>Online</span>
-            </button>
-          </div>
-        </div>
-        <div class="field">
+
           <label>Paid By</label>
           <div class="seg-cards seg-cards-4" data-f="paidby">
             ${paid.map((m, i) => `
@@ -87,14 +77,14 @@
     const subEl = form.querySelector('[data-f="subcategory"]');
     const descEl = form.querySelector('[data-f="description"]');
     const submitBtn = form.querySelector('[data-f="submit"]');
-    const payCards = form.querySelectorAll('[data-f="pay"] .seg-card');
     const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
+
 
     const { CATEGORIES, CATEGORY_NAMES } = currentCategories();
     const paid = currentPaid();
 
-    let paymentMethod = "Offline";
     let paidBy = (paid[0] && paid[0].name) || "Cash";
+
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
@@ -135,10 +125,7 @@
     catEl.addEventListener("change", () => { renderSub(); applyDescPrefix(); });
     subEl.addEventListener("change", applyDescPrefix);
 
-    payCards.forEach(c => c.addEventListener("click", () => {
-      paymentMethod = c.dataset.pay;
-      payCards.forEach(x => x.classList.toggle("active", x === c));
-    }));
+
 
     paidByCards.forEach(c => c.addEventListener("click", () => {
       paidBy = c.dataset.paidby;
@@ -152,9 +139,8 @@
       renderSub(existing.subcategory);
       descEl.value = existing.description || "";
       costEl.value = Number(existing.cost).toFixed(2);
-      paymentMethod = existing.paymentMethod || "Offline";
-      payCards.forEach(x => x.classList.toggle("active", x.dataset.pay === paymentMethod));
       paidBy = existing.paidBy || "Cash";
+
       paidByCards.forEach(x => x.classList.toggle("active", x.dataset.paidby === paidBy));
     } else {
       dateEl.value = todayGMT7();
@@ -182,8 +168,8 @@
         subcategory: subEl.value || null,
         description: descEl.value.trim(),
         cost: parseFloat(parseFloat(costEl.value).toFixed(2)),
-        paymentMethod,
         paidBy,
+
       };
       if (!rec.date || !rec.category || isNaN(rec.cost) || rec.cost <= 0) {
         (showToast || alert)("Please enter a valid amount");
