@@ -221,19 +221,25 @@
       const yms = [];
       for (let m = 1; m <= upto; m++) yms.push(y + String(m).padStart(2, "0"));
       const res = await this.loadMonths(yms);
-      // res shape: { months: { "202601": { rows: [...] }, ... } } OR { "202601": [...] }
-      const monthsObj = (res && (res.months || res)) || {};
+      // Apps Script returns an ARRAY: [{ ym, rows }, ...]. Also tolerate
+      // a future map shape { "202601": { rows: [...] } } or { months: {...} }.
+      const byYm = {};
+      if (Array.isArray(res)) {
+        res.forEach(o => { if (o && o.ym) byYm[String(o.ym)] = o.rows || []; });
+      } else if (res && typeof res === "object") {
+        const src = res.months || res;
+        Object.keys(src).forEach(k => {
+          const v = src[k];
+          byYm[k] = Array.isArray(v) ? v : (v && v.rows) || [];
+        });
+      }
+      // Safety: if the server returned nothing usable, do NOT wipe local data.
+      const gotAny = Object.values(byYm).some(rows => rows && rows.length);
+      if (!gotAny) { setLast(new Date().toISOString()); return 0; }
       const local = (window.Store && window.Store.all && window.Store.all()) || [];
-      const kept = local.filter(r => {
-        const ym = ymFromDate(r.date);
-        return !yms.includes(ym);
-      });
+      const kept = local.filter(r => !yms.includes(ymFromDate(r.date)));
       let incoming = [];
-      yms.forEach(ym => {
-        const v = monthsObj[ym];
-        const rows = Array.isArray(v) ? v : (v && v.rows) || [];
-        incoming = incoming.concat(rows.map(sheetToLocal));
-      });
+      yms.forEach(ym => { incoming = incoming.concat((byYm[ym] || []).map(sheetToLocal)); });
       localStorage.setItem("expenses_v1", JSON.stringify(kept.concat(incoming)));
       setLast(new Date().toISOString());
       return incoming.length;
