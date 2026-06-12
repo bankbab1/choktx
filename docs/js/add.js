@@ -83,8 +83,8 @@
     const { CATEGORIES, CATEGORY_NAMES } = currentCategories();
     const paid = currentPaid();
 
-    let paymentMethod = "Offline";
     let paidBy = (paid[0] && paid[0].name) || "Cash";
+
     const existing = editId ? Store.get(editId) : null;
 
     CATEGORY_NAMES.forEach(n => {
