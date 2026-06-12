@@ -128,6 +128,7 @@
   }
   filterCat.addEventListener("change", render);
   filterSearch.addEventListener("input", render);
+  filterSearchClear.addEventListener("click", () => { filterSearch.value = ""; filterSearch.focus(); render(); });
   filterPeriod.addEventListener("change", render);
   rangeFrom.addEventListener("change", () => { syncRangeBounds(); render(); });
   rangeTo.addEventListener("change", () => { syncRangeBounds(); render(); });
