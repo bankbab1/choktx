@@ -139,9 +139,8 @@
       renderSub(existing.subcategory);
       descEl.value = existing.description || "";
       costEl.value = Number(existing.cost).toFixed(2);
-      paymentMethod = existing.paymentMethod || "Offline";
-      payCards.forEach(x => x.classList.toggle("active", x.dataset.pay === paymentMethod));
       paidBy = existing.paidBy || "Cash";
+
       paidByCards.forEach(x => x.classList.toggle("active", x.dataset.paidby === paidBy));
     } else {
       dateEl.value = todayGMT7();
