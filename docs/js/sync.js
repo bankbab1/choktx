@@ -80,11 +80,8 @@
 
   // ===== Mapping: local record <-> sheet row =====
   function localToSheet(r) {
-    // Look up master ids so the sheet gets correct category/subcategory/paid ids.
     const catMeta = (window.Store && window.Store.getCategoriesMeta && window.Store.getCategoriesMeta()) || {};
-    const paidMeta = (window.Store && window.Store.getPaidMethodsMeta && window.Store.getPaidMethodsMeta()) || {};
     const cm = catMeta[r.category] || {};
-    const paidName = r.paidBy || r.paidby || "";
     return {
       id: r.id,
       date: r.date,
@@ -95,9 +92,6 @@
       category_name: r.category || "",
       subcategory_id: r.subcategory_id || (cm.subIds && r.subcategory && cm.subIds[r.subcategory]) || "",
       subcategory_name: r.subcategory || "",
-      channel: r.pay || "",
-      paid_method_id: r.paid_method_id || (paidMeta[paidName] && paidMeta[paidName].id) || "",
-      paid_method_name: paidName,
       note: r.description || "",
       tags: Array.isArray(r.tags) ? r.tags.join(",") : (r.tags || ""),
       source: "app",
@@ -111,8 +105,6 @@
       id: String(r.id),
       date: toYMD(r.date),
       cost: Number(r.amount) || 0,
-      pay: r.channel || "",
-      paidBy: r.paid_method_name || "",
       category: fixName(r.category_name),
       subcategory: fixName(r.subcategory_name),
       description: r.note || "",
@@ -120,6 +112,7 @@
       updated_at: r.updated_at || "",
     };
   }
+
 
   // ===== Public API =====
   const Sync = {
