@@ -25,44 +25,6 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="section-title">Data</div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-row-label">Export</div>
-            <div class="setting-row-desc">Download all records as JSON</div>
-          </div>
-          <button class="btn-sm setting-row-action" onclick="exportData()">Export</button>
-        </div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-row-label">Import</div>
-            <div class="setting-row-desc">Replace data from JSON file</div>
-          </div>
-          <label class="btn-sm setting-row-action" style="cursor:pointer">
-            Import
-            <input type="file" accept="application/json" style="display:none" onchange="importData(event)" />
-          </label>
-        </div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-row-label">Clear all data</div>
-            <div class="setting-row-desc">Delete every record permanently</div>
-          </div>
-          <button class="btn-sm danger setting-row-action" onclick="clearAll()">Clear</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Account</div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-row-label">Session</div>
-            <div class="setting-row-desc" id="gs-status">Not logged in</div>
-          </div>
-          <button class="btn-sm setting-row-action" id="gs-logout">Logout</button>
-        </div>
-      </div>
 
 
 
