@@ -20,11 +20,6 @@
     }
     return { CATEGORIES: window.CATEGORIES || {}, CATEGORY_NAMES: window.CATEGORY_NAMES || [] };
   }
-  function currentPaid() {
-    const fromStore = (window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods()) || null;
-    if (Array.isArray(fromStore) && fromStore.length) window.PAID_METHODS = fromStore;
-    return window.PAID_METHODS || [];
-  }
 
   window.expenseFormTemplate = function () {
     const paid = currentPaid();
