@@ -199,13 +199,33 @@
       return n;
     },
 
-    // Fire-and-forget background push (called from Store after mutations)
-    bgPush(action, payload) {
-      if (!hasSession()) return;
+    // Background push (called from Store after mutations).
+    // Returns a promise; optional onDone runs after a successful push.
+    bgPush(action, payload, onDone) {
+      if (!hasSession()) return Promise.resolve(false);
       const cfg = getCfg();
-      Promise.resolve().then(() =>
+      return Promise.resolve().then(() =>
         rawCall(Object.assign({ action, session: cfg.session }, payload || {}))
-      ).then(() => setLast(new Date().toISOString()), () => {});
+      ).then((d) => {
+        setLast(new Date().toISOString());
+        if (typeof onDone === "function") { try { onDone(d); } catch {} }
+        return true;
+      }, () => false);
+    },
+
+    // After a master save: re-pull master from Sheets so ids/order match,
+    // then tell pages to re-render.
+    refreshMaster() {
+      if (!hasSession()) return Promise.resolve();
+      return this.loadMasterIntoStore()
+        .then(() => window.dispatchEvent(new CustomEvent("expenses-synced")))
+        .catch(() => {});
+    },
+
+    // After a record mutation: force a fresh pull of the current month.
+    refreshRecords() {
+      if (window.syncFromSheets) return window.syncFromSheets({ force: true });
+      return Promise.resolve();
     },
 
 
