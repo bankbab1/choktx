@@ -137,7 +137,7 @@
       const cats = {};
       const catMeta = {}; // name -> { id, subIds: { subName: id } }
       (m.categories || []).forEach(r => {
-        const name = String(r.name || "").trim();
+        const name = fixName(r.name);
         if (!name) return;
         cats[name] = {
           color: r.color || "#6366f1",
@@ -147,8 +147,8 @@
         catMeta[name] = { id: String(r.id || ""), subIds: {} };
       });
       (m.subcategories || []).forEach(r => {
-        const catName = String(r.category_name || "").trim();
-        const sub = String(r.name || "").trim();
+        const catName = fixName(r.category_name);
+        const sub = fixName(r.name);
         if (!catName || !sub || !cats[catName]) return;
         cats[catName].sub.push(sub);
         catMeta[catName].subIds[sub] = String(r.id || "");
