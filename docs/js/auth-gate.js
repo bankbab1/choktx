@@ -123,7 +123,7 @@
         await Sync.login(code);
         msg.textContent = "Loading data…";
         try { await Sync.loadMasterIntoStore(); } catch (e) { /* non-fatal */ }
-        try { await Sync.pullCurrentMonth(); } catch (e) { /* non-fatal */ }
+        try { if (Sync.pullYearToDate) await Sync.pullYearToDate(); else await Sync.pullCurrentMonth(); } catch (e) { /* non-fatal */ }
         msg.textContent = "Unlocked"; msg.className = "auth-gate-msg ok";
         setTimeout(() => {
           wrap.remove();
