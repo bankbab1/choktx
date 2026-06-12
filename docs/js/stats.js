@@ -204,17 +204,8 @@
       paidBox.appendChild(row);
     });
 
-    // Online vs Offline
-    let on = 0, off = 0;
-    curr.forEach(x => { if ((x.paymentMethod || "Offline") === "Online") on += Number(x.cost); else off += Number(x.cost); });
-    const onPct = total ? (on / total) * 100 : 0;
-    const offPct = 100 - onPct;
-    $("split-bar").innerHTML = `
-      <div class="split-seg online" style="width:${onPct.toFixed(1)}%"></div>
-      <div class="split-seg offline" style="width:${offPct.toFixed(1)}%"></div>`;
-    $("split-legend").innerHTML = `
-      <div class="split-item"><span class="dot online"></span>Online <strong>${fmt(on)}</strong> <em>${onPct.toFixed(1)}%</em></div>
-      <div class="split-item"><span class="dot offline"></span>Offline <strong>${fmt(off)}</strong> <em>${offPct.toFixed(1)}%</em></div>`;
+
+
 
     // Day of week
     const dow = [0, 0, 0, 0, 0, 0, 0];
