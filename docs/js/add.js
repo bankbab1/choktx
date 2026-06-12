@@ -39,17 +39,7 @@
           <input data-f="cost" class="cost-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" required />
         </div>
         <div class="field">
-          <label>Payment Method</label>
-          <div class="seg-cards" data-f="pay">
-            <button type="button" class="seg-card active" data-pay="Offline">
-              <i data-lucide="wallet"></i><span>Offline</span>
-            </button>
-            <button type="button" class="seg-card" data-pay="Online">
-              <i data-lucide="credit-card"></i><span>Online</span>
-            </button>
-          </div>
-        </div>
-        <div class="field">
+
           <label>Paid By</label>
           <div class="seg-cards seg-cards-4" data-f="paidby">
             ${paid.map((m, i) => `
