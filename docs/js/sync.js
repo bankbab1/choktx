@@ -141,6 +141,7 @@
       const m = await call("loadMaster");
       const cats = {};
       const catMeta = {}; // name -> { id, subIds: { subName: id } }
+      const idToName = {}; // category_id -> name
       (m.categories || []).forEach(r => {
         const name = fixName(r.name);
         if (!name) return;
@@ -150,12 +151,19 @@
           sub: [],
         };
         catMeta[name] = { id: String(r.id || ""), subIds: {} };
+        if (r.id != null && String(r.id)) idToName[String(r.id)] = name;
       });
       (m.subcategories || []).forEach(r => {
-        const catName = fixName(r.category_name);
-        const sub = fixName(r.name);
-        if (!catName || !sub || !cats[catName]) return;
-        cats[catName].sub.push(sub);
+        const sub = fixName(r.name != null ? r.name : r.subcategory_name);
+        if (!sub) return;
+        // Resolve parent by category_id first (most reliable), then by name text.
+        let catName = idToName[String(r.category_id || "")] || "";
+        if (!catName) {
+          const byName = fixName(r.category_name != null ? r.category_name : r.category);
+          if (byName && cats[byName]) catName = byName;
+        }
+        if (!catName) return;
+        if (!cats[catName].sub.includes(sub)) cats[catName].sub.push(sub);
         catMeta[catName].subIds[sub] = String(r.id || "");
       });
       const paid = (m.paid_methods || [])
