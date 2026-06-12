@@ -263,7 +263,7 @@ body {
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
-  font-size: 15px;
+  font-size: 16px;
   font-family: inherit;
   outline: none;
   transition: border-color .15s;
@@ -366,7 +366,7 @@ body {
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  font-size: 13px;
+  font-size: 16px;
   font-family: inherit;
 }
 .day-head {
@@ -637,10 +637,17 @@ body {
 
 /* === Prevent pull-to-refresh / overscroll bounce === */
 html, body {
-  overscroll-behavior-y: contain;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
   overscroll-behavior-x: none;
 }
-body { touch-action: pan-y; }
+html, body { height: 100%; }
+body { touch-action: pan-x pan-y; }
+/* Ensure all text inputs are >=16px to prevent iOS auto-zoom on focus */
+input, select, textarea, button { font-size: 16px; }
+input[type="date"], input[type="number"], input[type="text"], input[type="search"], input[type="email"], input[type="tel"], input[type="password"], select, textarea {
+  font-size: 16px;
+}
 
 /* === Bottom sheet === */
 .sheet-backdrop {
