@@ -4,6 +4,8 @@
   const filterCat = document.getElementById("filter-cat");
   const filterPeriod = document.getElementById("filter-period");
   const filterSearch = document.getElementById("filter-search");
+  const filterSearchClear = document.getElementById("filter-search-clear");
+  const resultCount = document.getElementById("result-count");
   const rangeRow = document.getElementById("range-row");
   const rangeFrom = document.getElementById("range-from");
   const rangeTo = document.getElementById("range-to");
@@ -75,6 +77,15 @@
     });
     listEl.innerHTML = "";
     emptyEl.style.display = rows.length ? "none" : "block";
+    filterSearchClear.classList.toggle("show", !!filterSearch.value);
+    if (q) {
+      const total = rows.reduce((s, r) => s + Number(r.cost), 0);
+      resultCount.style.display = "inline-block";
+      resultCount.textContent = `${rows.length} match${rows.length === 1 ? "" : "es"} · ${fmt(total)}`;
+    } else {
+      resultCount.style.display = "none";
+    }
+
 
     const groups = {};
     rows.forEach(r => { (groups[r.date] = groups[r.date] || []).push(r); });
@@ -117,6 +128,7 @@
   }
   filterCat.addEventListener("change", render);
   filterSearch.addEventListener("input", render);
+  filterSearchClear.addEventListener("click", () => { filterSearch.value = ""; filterSearch.focus(); render(); });
   filterPeriod.addEventListener("change", render);
   rangeFrom.addEventListener("change", () => { syncRangeBounds(); render(); });
   rangeTo.addEventListener("change", () => { syncRangeBounds(); render(); });
