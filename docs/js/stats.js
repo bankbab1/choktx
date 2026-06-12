@@ -2,6 +2,7 @@
   const $ = (id) => document.getElementById(id);
   const periodBtns = document.querySelectorAll("#stats-period .period-btn");
   let period = "month";
+  let includeInvest = localStorage.getItem("stats_include_invest") !== "0";
   let trendChart, catChart, dowChart;
 
   const fmt = (n) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
