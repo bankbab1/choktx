@@ -38,7 +38,8 @@
       const before = snapshot();
       try {
         if (withMaster) await Sync.loadMasterIntoStore();
-        await Sync.pullCurrentMonth();
+        if (Sync.pullYearToDate) await Sync.pullYearToDate();
+        else await Sync.pullCurrentMonth();
         if (snapshot() !== before && !uiBusy()) {
           window.dispatchEvent(new CustomEvent("expenses-synced"));
         }
@@ -55,7 +56,7 @@
       sessionStorage.setItem("master_boot_attempted", "1");
       const before = snapshot();
       Sync.loadMasterIntoStore()
-        .then(() => Sync.pullCurrentMonth().catch(() => {}))
+        .then(() => (Sync.pullYearToDate ? Sync.pullYearToDate() : Sync.pullCurrentMonth()).catch(() => {}))
         .then(() => {
           if (snapshot() !== before && !uiBusy()) {
             window.dispatchEvent(new CustomEvent("expenses-synced"));
@@ -122,7 +123,7 @@
         await Sync.login(code);
         msg.textContent = "Loading data…";
         try { await Sync.loadMasterIntoStore(); } catch (e) { /* non-fatal */ }
-        try { await Sync.pullCurrentMonth(); } catch (e) { /* non-fatal */ }
+        try { if (Sync.pullYearToDate) await Sync.pullYearToDate(); else await Sync.pullCurrentMonth(); } catch (e) { /* non-fatal */ }
         msg.textContent = "Unlocked"; msg.className = "auth-gate-msg ok";
         setTimeout(() => {
           wrap.remove();
