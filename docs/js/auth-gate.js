@@ -139,17 +139,22 @@
     btn.addEventListener("click", submit);
     const pasteBtn = wrap.querySelector("#ag-paste");
     pasteBtn.addEventListener("click", async () => {
-      try {
-        const txt = await navigator.clipboard.readText();
-        const digits = (txt || "").replace(/\D/g, "").slice(0, 6);
-        if (!digits) { msg.textContent = "Clipboard has no digits"; msg.className = "auth-gate-msg err"; return; }
-        input.value = digits;
-        if (digits.length === 6) submit();
-        else input.focus();
-      } catch (e) {
-        msg.textContent = "Paste blocked — long-press the field instead";
-        msg.className = "auth-gate-msg err";
+      // Try the Clipboard API first (works on Chrome / Android / desktop Safari 13.1+).
+      // iOS Safari blocks readText() — fall back to focusing the field so iOS
+      // shows its native "Paste" bubble above the input.
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          const txt = await navigator.clipboard.readText();
+          const digits = (txt || "").replace(/\D/g, "").slice(0, 6);
+          if (digits) {
+            input.value = digits;
+            if (digits.length === 6) { submit(); return; }
+          }
+        } catch (e) { /* fall through to focus */ }
       }
+      input.focus();
+      msg.textContent = "Tap the field, then tap Paste";
+      msg.className = "auth-gate-msg";
     });
     input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); submit(); } });
     input.addEventListener("input", () => {
