@@ -168,8 +168,8 @@
         subcategory: subEl.value || null,
         description: descEl.value.trim(),
         cost: parseFloat(parseFloat(costEl.value).toFixed(2)),
-        paymentMethod,
         paidBy,
+
       };
       if (!rec.date || !rec.category || isNaN(rec.cost) || rec.cost <= 0) {
         (showToast || alert)("Please enter a valid amount");
