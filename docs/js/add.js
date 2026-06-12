@@ -22,7 +22,6 @@
   }
 
   window.expenseFormTemplate = function () {
-    const paid = currentPaid();
     return `
       <form class="expense-form" novalidate>
         <div class="field">
@@ -33,17 +32,6 @@
           <label>Amount</label>
           <input data-f="cost" class="cost-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" required />
         </div>
-        <div class="field">
-
-          <label>Paid By</label>
-          <div class="seg-cards seg-cards-4" data-f="paidby">
-            ${paid.map((m, i) => `
-              <button type="button" class="seg-card ${i===0?"active":""}" data-paidby="${m.name.replace(/"/g,"&quot;")}">
-                <i data-lucide="${m.icon}"></i><span>${m.name}</span>
-              </button>`).join("")}
-          </div>
-        </div>
-
         <div class="field">
           <label>Category</label>
           <select data-f="category" required></select>
@@ -62,7 +50,6 @@
 
   window.initExpenseForm = function (root, opts = {}) {
     const { editId = null, onSaved = null, showToast } = opts;
-    const $ = (sel) => root.querySelector(sel);
     const form = root.tagName === "FORM" ? root : root.querySelector("form");
 
     const dateEl = form.querySelector('[data-f="date"]');
@@ -72,13 +59,8 @@
     const subEl = form.querySelector('[data-f="subcategory"]');
     const descEl = form.querySelector('[data-f="description"]');
     const submitBtn = form.querySelector('[data-f="submit"]');
-    const paidByCards = form.querySelectorAll('[data-f="paidby"] .seg-card');
-
 
     const { CATEGORIES, CATEGORY_NAMES } = currentCategories();
-    const paid = currentPaid();
-
-    let paidBy = (paid[0] && paid[0].name) || "Cash";
 
     const existing = editId ? Store.get(editId) : null;
 
@@ -120,13 +102,6 @@
     catEl.addEventListener("change", () => { renderSub(); applyDescPrefix(); });
     subEl.addEventListener("change", applyDescPrefix);
 
-
-
-    paidByCards.forEach(c => c.addEventListener("click", () => {
-      paidBy = c.dataset.paidby;
-      paidByCards.forEach(x => x.classList.toggle("active", x === c));
-    }));
-
     if (existing) {
       submitBtn.textContent = "Update Expense";
       dateEl.value = existing.date;
@@ -134,9 +109,6 @@
       renderSub(existing.subcategory);
       descEl.value = existing.description || "";
       costEl.value = Number(existing.cost).toFixed(2);
-      paidBy = existing.paidBy || "Cash";
-
-      paidByCards.forEach(x => x.classList.toggle("active", x.dataset.paidby === paidBy));
     } else {
       dateEl.value = todayGMT7();
       renderSub();
@@ -163,8 +135,6 @@
         subcategory: subEl.value || null,
         description: descEl.value.trim(),
         cost: parseFloat(parseFloat(costEl.value).toFixed(2)),
-        paidBy,
-
       };
       if (!rec.date || !rec.category || isNaN(rec.cost) || rec.cost <= 0) {
         (showToast || alert)("Please enter a valid amount");
