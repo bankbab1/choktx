@@ -245,6 +245,16 @@
     });
   });
 
+  const investToggle = document.getElementById("invest-toggle");
+  if (investToggle) {
+    investToggle.checked = includeInvest;
+    investToggle.addEventListener("change", () => {
+      includeInvest = investToggle.checked;
+      localStorage.setItem("stats_include_invest", includeInvest ? "1" : "0");
+      render();
+    });
+  }
+
   render();
   window.onExpenseSaved = render;
   window.addEventListener("expenses-synced", () => { if (!document.querySelector(".sheet-backdrop, .modal-backdrop")) render(); });
