@@ -35,7 +35,8 @@
     window.Store.setPaidMethods(arr);
     window.PAID_METHODS = arr;
     if (window.Sync && window.Sync.loggedIn && window.Sync.loggedIn()) {
-      window.Sync.bgPush("saveMaster", { paid_methods: serializePaid(arr) });
+      window.Sync.bgPush("saveMaster", { paid_methods: serializePaid(arr) },
+        () => window.Sync.refreshMaster());
     }
   };
 })();

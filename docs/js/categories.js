@@ -58,10 +58,10 @@
     window.Store.setCategories(obj);
     window.CATEGORIES = obj;
     window.CATEGORY_NAMES = Object.keys(obj);
-    // Push to Google Sheets master (background)
+    // Push to Google Sheets master, then re-pull so ids stay in sync
     if (window.Sync && window.Sync.loggedIn && window.Sync.loggedIn()) {
       const payload = serializeCategories(obj);
-      window.Sync.bgPush("saveMaster", payload);
+      window.Sync.bgPush("saveMaster", payload, () => window.Sync.refreshMaster());
     }
   };
 })();

@@ -24,7 +24,8 @@
       list.push(rec);
       write(list);
       if (window.Sync && window.Sync.hasSession()) {
-        window.Sync.bgPush("appendRecord", { record: window.Sync._map.localToSheet(rec) });
+        window.Sync.bgPush("appendRecord", { record: window.Sync._map.localToSheet(rec) },
+          () => window.Sync.refreshRecords());
       }
       return rec;
     },
@@ -36,14 +37,15 @@
       list[i] = { ...list[i], ...patch, id, updated_at: t };
       write(list);
       if (window.Sync && window.Sync.hasSession()) {
-        window.Sync.bgPush("updateRecord", { id, patch: window.Sync._map.localToSheet(list[i]) });
+        window.Sync.bgPush("updateRecord", { id, patch: window.Sync._map.localToSheet(list[i]) },
+          () => window.Sync.refreshRecords());
       }
       return list[i];
     },
     remove(id) {
       write(read().filter(r => r.id !== id));
       if (window.Sync && window.Sync.hasSession()) {
-        window.Sync.bgPush("deleteRecord", { id });
+        window.Sync.bgPush("deleteRecord", { id }, () => window.Sync.refreshRecords());
       }
     },
     clear() { localStorage.removeItem(KEY); },
