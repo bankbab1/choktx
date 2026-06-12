@@ -355,41 +355,4 @@
   });
 })();
 
-// ===== Account status / Logout =====
-(function () {
-  if (!window.Sync) return;
-  const statusEl = document.getElementById("gs-status");
-  const logoutBtn = document.getElementById("gs-logout");
-  if (!statusEl || !logoutBtn) return;
-
-  function refresh() {
-    if (Sync.loggedIn()) {
-      const exp = new Date(Sync.sessionExp() * 1000).toLocaleString();
-      const last = Sync.getLast();
-      statusEl.textContent = `Logged in until ${exp}` + (last ? ` · last sync ${new Date(last).toLocaleTimeString()}` : "");
-    } else {
-      statusEl.textContent = "Not logged in";
-    }
-  }
-  refresh();
-
-  logoutBtn.addEventListener("click", async () => {
-    const ok = await window.confirmModal({
-      title: "Log out?",
-      message: "You'll need your 6-digit code again to use the app.",
-      confirmText: "Logout",
-      danger: true,
-    });
-    if (!ok) return;
-    Sync.logout();
-    // Wipe local caches so the next login pulls fresh from Sheets.
-    try {
-      localStorage.removeItem("categories_v1");
-      localStorage.removeItem("paid_methods_v1");
-      localStorage.removeItem("expenses_v1");
-    } catch {}
-    location.reload();
-  });
-})();
-
 
