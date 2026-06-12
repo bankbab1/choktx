@@ -221,138 +221,16 @@
     if (ok) { Store.clear(); renderCats(); }
   };
 
-  // === Paid By Methods CRUD ===
-  const paidList = document.getElementById("paid-list");
-
-  function renderPaid() {
-    if (!paidList) return;
-    paidList.innerHTML = "";
-    (window.PAID_METHODS || []).forEach((m, idx) => {
-      const row = document.createElement("div");
-      row.className = "cat-editor-row";
-      row.innerHTML = `
-        <div class="cat-icon" style="background:var(--surface-2);color:var(--text)">
-          <i data-lucide="${m.icon}"></i>
-        </div>
-        <div class="cat-editor-body">
-          <div class="cat-editor-name">${escapeHtml(m.name)}</div>
-        </div>
-        <div class="cat-editor-actions">
-          <button data-edit-paid="${idx}" aria-label="Edit"><i data-lucide="pencil"></i></button>
-          <button class="danger" data-del-paid="${idx}" aria-label="Delete"><i data-lucide="trash-2"></i></button>
-        </div>`;
-      paidList.appendChild(row);
-    });
-    window.refreshIcons && window.refreshIcons();
-  }
-
-  function openPaidEditor(idx) {
-    const isEdit = idx != null;
-    const existing = isEdit ? structuredClone(window.PAID_METHODS[idx]) : null;
-    const state = { name: existing?.name || "", icon: existing?.icon || PAID_ICON_CHOICES[0] };
-
-    const root = document.getElementById("sheet-root") || (() => {
-      const r = document.createElement("div"); r.id = "sheet-root"; document.body.appendChild(r); return r;
-    })();
-
-    root.innerHTML = `
-      <div class="sheet-backdrop">
-        <div class="sheet" role="dialog" aria-modal="true">
-          <div class="sheet-handle"><div class="sheet-grip"></div></div>
-          <div class="sheet-header">
-            <h2 class="sheet-title">${isEdit ? "Edit Paid Method" : "New Paid Method"}</h2>
-            <button class="icon-btn sheet-close" data-close aria-label="Close"><i data-lucide="x"></i></button>
-          </div>
-          <div class="sheet-body">
-            <div class="field">
-              <label>Name</label>
-              <input id="pe-name" type="text" maxlength="30" placeholder="e.g. Cash" value="${escapeAttr(state.name)}" />
-            </div>
-            <div class="field">
-              <label>Icon</label>
-              <div class="icon-row">
-                ${PAID_ICON_CHOICES.map(i => `<button type="button" class="icon-pick ${i===state.icon?"active":""}" data-picon="${i}"><i data-lucide="${i}"></i></button>`).join("")}
-              </div>
-            </div>
-            <button class="btn" id="pe-save">${isEdit ? "Save Changes" : "Create"}</button>
-          </div>
-        </div>
-      </div>`;
-
-    const backdrop = root.querySelector(".sheet-backdrop");
-    const sheet = root.querySelector(".sheet");
-    requestAnimationFrame(() => backdrop.classList.add("open"));
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    function close() {
-      backdrop.classList.remove("open");
-      sheet.style.transform = "translateY(100%)";
-      setTimeout(() => { root.innerHTML = ""; document.body.style.overflow = prevOverflow; }, 220);
-    }
-    sheet.addEventListener("click", (e) => e.stopPropagation());
-    sheet.addEventListener("mousedown", (e) => e.stopPropagation());
-    sheet.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
-    backdrop.addEventListener("click", (e) => { if (e.target === backdrop) close(); });
-    root.querySelectorAll(".sheet-close").forEach(b => b.addEventListener("click", close));
-
-    root.querySelectorAll("[data-picon]").forEach(b => b.addEventListener("click", () => {
-      state.icon = b.dataset.picon;
-      root.querySelectorAll("[data-picon]").forEach(x => x.classList.toggle("active", x === b));
-    }));
-
-    root.querySelector("#pe-save").addEventListener("click", () => {
-      const nameInput = root.querySelector("#pe-name");
-      const name = nameInput.value.trim();
-      if (!name) { nameInput.focus(); return; }
-      const next = structuredClone(window.PAID_METHODS);
-      if (!isEdit && next.some(m => m.name === name)) { window.alertModal({ title: "Already exists", message: `A method named "${name}" already exists.`, icon: "warning" }); return; }
-      const entry = { name, icon: state.icon };
-      if (isEdit) next[idx] = entry; else next.push(entry);
-      savePaidMethods(next);
-      close();
-      renderPaid();
-    });
-
-    window.refreshIcons && window.refreshIcons();
-  }
-
-  if (paidList) {
-    paidList.addEventListener("click", async (e) => {
-      const edit = e.target.closest("[data-edit-paid]");
-      const del = e.target.closest("[data-del-paid]");
-      if (edit) openPaidEditor(Number(edit.dataset.editPaid));
-      if (del) {
-        const i = Number(del.dataset.delPaid);
-        const m = window.PAID_METHODS[i];
-        const ok = await window.confirmModal({
-          title: `Delete "${m.name}"?`,
-          message: "Existing records keep their label, but it will no longer appear in the picker.",
-          confirmText: "Delete",
-          danger: true,
-        });
-        if (!ok) return;
-        const next = structuredClone(window.PAID_METHODS);
-        next.splice(i, 1);
-        savePaidMethods(next);
-        renderPaid();
-      }
-    });
-    document.getElementById("add-paid-btn").addEventListener("click", () => openPaidEditor(null));
-  }
-
   renderCats();
-  renderPaid();
 
   // Re-render when master data finishes loading from Google Sheets
   window.addEventListener("expenses-synced", () => {
     if (document.querySelector(".sheet-backdrop, .modal-backdrop")) return;
     window.CATEGORIES = (window.Store.getCategories && window.Store.getCategories()) || {};
     window.CATEGORY_NAMES = Object.keys(window.CATEGORIES);
-    window.PAID_METHODS = (window.Store.getPaidMethods && window.Store.getPaidMethods()) || [];
     renderCats();
-    renderPaid();
   });
+
 })();
 
 

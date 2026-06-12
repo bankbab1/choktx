@@ -182,27 +182,8 @@
       catBox.appendChild(row);
     });
 
-    // Paid By
-    const byPaid = {};
-    curr.forEach(x => { const k = x.paidBy || "Cash"; byPaid[k] = (byPaid[k] || 0) + Number(x.cost); });
-    const paidBox = $("paid-breakdown");
-    paidBox.innerHTML = "";
-    const paidEntries = Object.entries(byPaid).sort((a, b) => b[1] - a[1]);
-    paidEntries.forEach(([name, v]) => {
-      const meta = (window.PAID_METHODS || []).find(m => m.name === name) || { icon: "wallet" };
-      const pct = (v / total) * 100;
-      const row = document.createElement("div");
-      row.className = "cat-row";
-      row.innerHTML = `
-        <div class="cat-row-head">
-          <span class="cat-icon paid"><i data-lucide="${meta.icon}"></i></span>
-          <span class="cat-name">${name}</span>
-          <span class="cat-amt">${fmt(v)}</span>
-        </div>
-        <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct.toFixed(1)}%;background:var(--primary)"></div></div>
-        <div class="cat-pct">${pct.toFixed(1)}%</div>`;
-      paidBox.appendChild(row);
-    });
+
+
 
 
 

@@ -9,8 +9,7 @@
   //  - Dispatch `expenses-synced` ONLY when data actually changed.
   if (Sync.loggedIn()) {
     const cats = window.Store && window.Store.getCategories && window.Store.getCategories();
-    const paid = window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods();
-    const needMaster = !cats || !Object.keys(cats || {}).length || !Array.isArray(paid) || !paid.length;
+    const needMaster = !cats || !Object.keys(cats || {}).length;
 
     const THROTTLE_MS = 60000;
     let lastSyncAt = 0;
