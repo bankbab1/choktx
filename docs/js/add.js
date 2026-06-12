@@ -125,10 +125,7 @@
     catEl.addEventListener("change", () => { renderSub(); applyDescPrefix(); });
     subEl.addEventListener("change", applyDescPrefix);
 
-    payCards.forEach(c => c.addEventListener("click", () => {
-      paymentMethod = c.dataset.pay;
-      payCards.forEach(x => x.classList.toggle("active", x === c));
-    }));
+
 
     paidByCards.forEach(c => c.addEventListener("click", () => {
       paidBy = c.dataset.paidby;
