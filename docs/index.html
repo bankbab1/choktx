@@ -71,5 +71,30 @@
   <script src="js/sheet.js"></script>
   <script src="js/nav.js"></script>
   <script src="js/dashboard.js"></script>
+  <script>
+    (function () {
+      const btn = document.getElementById("header-logout-btn");
+      if (!btn || !window.Sync) return;
+      function refresh() { btn.style.display = window.Sync.loggedIn() ? "" : "none"; }
+      refresh();
+      window.addEventListener("expenses-synced", refresh);
+      btn.addEventListener("click", async () => {
+        const ok = await window.confirmModal({
+          title: "Log out?",
+          message: "You'll need your 6-digit code again to use the app.",
+          confirmText: "Logout",
+          danger: true,
+        });
+        if (!ok) return;
+        window.Sync.logout();
+        try {
+          localStorage.removeItem("categories_v1");
+          localStorage.removeItem("paid_methods_v1");
+          localStorage.removeItem("expenses_v1");
+        } catch {}
+        location.reload();
+      });
+    })();
+  </script>
 </body>
 </html>
