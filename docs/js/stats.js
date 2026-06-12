@@ -248,11 +248,13 @@
   const investToggle = document.getElementById("invest-toggle");
   if (investToggle) {
     investToggle.checked = includeInvest;
-    investToggle.addEventListener("change", () => {
-      includeInvest = investToggle.checked;
+    const onToggle = () => {
+      includeInvest = !!investToggle.checked;
       localStorage.setItem("stats_include_invest", includeInvest ? "1" : "0");
       render();
-    });
+    };
+    investToggle.addEventListener("change", onToggle);
+    investToggle.addEventListener("input", onToggle);
   }
 
   render();
