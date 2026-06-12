@@ -2,6 +2,7 @@
   const $ = (id) => document.getElementById(id);
   const periodBtns = document.querySelectorAll("#stats-period .period-btn");
   let period = "month";
+  let includeInvest = localStorage.getItem("stats_include_invest") !== "0";
   let trendChart, catChart, dowChart;
 
   const fmt = (n) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -74,7 +75,8 @@
   function render() {
     const r = rangeFor(period);
     const pr = prevRangeFor(period);
-    const all = Store.all();
+    const isInvest = (c) => String(c || "").trim().toLowerCase() === "invest";
+    const all = Store.all().filter(x => includeInvest || !isInvest(x.category));
     const curr = all.filter(x => within(r, x.date));
     const prev = all.filter(x => within(pr, x.date));
 
@@ -242,6 +244,16 @@
       render();
     });
   });
+
+  const investToggle = document.getElementById("invest-toggle");
+  if (investToggle) {
+    investToggle.checked = includeInvest;
+    investToggle.addEventListener("change", () => {
+      includeInvest = investToggle.checked;
+      localStorage.setItem("stats_include_invest", includeInvest ? "1" : "0");
+      render();
+    });
+  }
 
   render();
   window.onExpenseSaved = render;
