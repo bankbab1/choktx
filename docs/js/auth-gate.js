@@ -47,14 +47,20 @@
     }
     window.syncFromSheets = syncFromSheets;
 
-    // First load: if master is missing we MUST reload after pulling, because
-    // categories.js has already captured an empty CATEGORIES object.
-    if (needMaster) {
+    // First load: if master is missing, pull it once. Only reload if data
+    // ACTUALLY arrived (otherwise an empty sheet causes an endless reload
+    // loop that closes any open sheet/input). Guarded to once per session.
+    if (needMaster && !sessionStorage.getItem("master_boot_attempted")) {
+      sessionStorage.setItem("master_boot_attempted", "1");
+      const before = snapshot();
       Sync.loadMasterIntoStore()
         .then(() => Sync.pullCurrentMonth().catch(() => {}))
-        .then(() => location.reload())
+        .then(() => {
+          // Reload only when new data came in AND the user isn't mid-input.
+          if (snapshot() !== before && !uiBusy()) location.reload();
+        })
         .catch(() => {});
-    } else {
+    } else if (!needMaster) {
       // Page load/refresh: full pull (master + current month)
       syncFromSheets({ withMaster: true, force: true });
     }
