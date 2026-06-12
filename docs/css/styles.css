@@ -841,12 +841,13 @@ input[type="date"], input[type="number"], input[type="text"], input[type="search
 }
 .sub-add input {
   flex: 1;
-  padding: 9px 11px;
+  min-width: 0;
+  padding: 11px 12px;
   border-radius: 9px;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text);
-  font-size: 13px;
+  font-size: 16px;
   font-family: inherit;
   outline: none;
 }
