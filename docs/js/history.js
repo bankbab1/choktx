@@ -15,7 +15,7 @@
 
   function startOf(p) {
     if (p === "all" || p === "custom") return new Date(0);
-    const d = TZ.todayLocalAnchor();
+    const d = new Date(); d.setHours(0, 0, 0, 0);
     if (p === "day") return d;
     if (p === "week") { d.setDate(d.getDate() - d.getDay()); return d; }
     if (p === "month") { d.setDate(1); return d; }
@@ -23,7 +23,11 @@
     return new Date(0);
   }
   function fmt(n) { return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-  function todayISO_GMT7() { return TZ.todayStr(); }
+  function todayISO_GMT7() {
+    const d = new Date();
+    const bkk = new Date(d.getTime() + (d.getTimezoneOffset() + 420) * 60000);
+    return bkk.toISOString().slice(0, 10);
+  }
   function formatDateLabel(iso) {
     const d = new Date(iso + "T00:00:00");
     const todayStr = todayISO_GMT7();
@@ -60,7 +64,7 @@
         if (to && r.date > to) return false;
         return true;
       }
-      return TZ.parseDateStr(r.date) >= start;
+      return new Date(r.date) >= start;
     });
     listEl.innerHTML = "";
     emptyEl.style.display = rows.length ? "none" : "block";

@@ -110,7 +110,6 @@
       const m = await call("loadMaster");
       const cats = {};
       const catMeta = {}; // name -> { id, subIds: { subName: id } }
-      const idToName = {}; // category_id -> name (for resolving subs by id)
       (m.categories || []).forEach(r => {
         const name = String(r.name || "").trim();
         if (!name) return;
@@ -119,20 +118,13 @@
           icon: r.icon || "tag",
           sub: [],
         };
-        const id = String(r.id || "");
-        catMeta[name] = { id, subIds: {} };
-        if (id) idToName[id] = name;
+        catMeta[name] = { id: String(r.id || ""), subIds: {} };
       });
       (m.subcategories || []).forEach(r => {
-        let catName = String(r.category_name || "").trim();
+        const catName = String(r.category_name || "").trim();
         const sub = String(r.name || "").trim();
-        // Fallback: resolve by category_id if name is missing or doesn't match
-        if ((!catName || !cats[catName]) && r.category_id) {
-          const byId = idToName[String(r.category_id)];
-          if (byId) catName = byId;
-        }
         if (!catName || !sub || !cats[catName]) return;
-        if (cats[catName].sub.indexOf(sub) === -1) cats[catName].sub.push(sub);
+        cats[catName].sub.push(sub);
         catMeta[catName].subIds[sub] = String(r.id || "");
       });
       const paid = (m.paid_methods || [])

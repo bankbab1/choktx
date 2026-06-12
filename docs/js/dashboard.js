@@ -12,7 +12,8 @@
   let period = "day";
 
   function startOf(p) {
-    const d = TZ.todayLocalAnchor();
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
     if (p === "day") return d;
     if (p === "week") { d.setDate(d.getDate() - d.getDay()); return d; }
     if (p === "month") { d.setDate(1); return d; }
@@ -20,7 +21,11 @@
   }
   function fmtMoney(n) { return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
-  function todayISO_GMT7() { return TZ.todayStr(); }
+  function todayISO_GMT7() {
+    const d = new Date();
+    const bkk = new Date(d.getTime() + (d.getTimezoneOffset() + 420) * 60000);
+    return bkk.toISOString().slice(0, 10);
+  }
   function formatDateLabel(iso) {
     const d = new Date(iso + "T00:00:00");
     const todayStr = todayISO_GMT7();
@@ -45,7 +50,7 @@
 
   function render() {
     const start = startOf(period);
-    const all = Store.all().filter(r => TZ.parseDateStr(r.date) >= start);
+    const all = Store.all().filter(r => new Date(r.date) >= start);
     const total = all.reduce((s, r) => s + Number(r.cost), 0);
 
     totalEl.textContent = fmtMoney(total);

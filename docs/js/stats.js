@@ -13,17 +13,16 @@
     return n.toFixed(0);
   };
 
-  function rangeFor(p, anchor) {
-    const a = anchor ? new Date(anchor) : TZ.todayLocalAnchor();
-    const end = new Date(a); end.setHours(23, 59, 59, 999);
-    const start = new Date(a); start.setHours(0, 0, 0, 0);
+  function rangeFor(p, anchor = new Date()) {
+    const end = new Date(anchor); end.setHours(23, 59, 59, 999);
+    const start = new Date(anchor); start.setHours(0, 0, 0, 0);
     if (p === "week") { start.setDate(start.getDate() - 6); }
     else if (p === "month") { start.setDate(1); }
     else if (p === "year") { start.setMonth(0, 1); }
     return { start, end };
   }
-  function prevRangeFor(p, anchor) {
-    const a = anchor ? new Date(anchor) : TZ.todayLocalAnchor();
+  function prevRangeFor(p, anchor = new Date()) {
+    const a = new Date(anchor);
     if (p === "week") a.setDate(a.getDate() - 7);
     else if (p === "month") a.setMonth(a.getMonth() - 1);
     else if (p === "year") a.setFullYear(a.getFullYear() - 1);
