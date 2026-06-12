@@ -2,22 +2,50 @@
 (function () {
   if (!window.Sync) return;
 
-  // Logged-in path: keep frontend in sync with Sheets in (near-)realtime.
-  //  - On every page load: pull master + current month from Sheets.
-  //  - On tab focus / visibility return: pull current month again.
-  //  - After a successful pull, dispatch `expenses-synced` so the page re-renders.
+  // Logged-in path: keep frontend in sync with Sheets.
+  //  - On page load/refresh: pull master + current month from Sheets.
+  //  - On tab visibility return: pull again (throttled to 60s).
+  //  - NEVER sync while a sheet/modal is open (would reset the UI under the user).
+  //  - Dispatch `expenses-synced` ONLY when data actually changed.
   if (Sync.loggedIn()) {
     const cats = window.Store && window.Store.getCategories && window.Store.getCategories();
     const paid = window.Store && window.Store.getPaidMethods && window.Store.getPaidMethods();
     const needMaster = !cats || !Object.keys(cats || {}).length || !Array.isArray(paid) || !paid.length;
 
-    async function syncFromSheets({ withMaster } = { withMaster: false }) {
+    const THROTTLE_MS = 60000;
+    let lastSyncAt = 0;
+    let syncing = false;
+
+    function snapshot() {
+      return [
+        localStorage.getItem("expenses_v1") || "",
+        localStorage.getItem("categories_v1") || "",
+        localStorage.getItem("paid_methods_v1") || "",
+      ].join("|");
+    }
+    function uiBusy() {
+      const r = document.getElementById("sheet-root");
+      return !!(r && r.childElementCount) ||
+        !!document.querySelector(".sheet-backdrop, .modal-backdrop");
+    }
+
+    async function syncFromSheets({ withMaster = false, force = false } = {}) {
+      if (syncing) return;
+      if (!force && Date.now() - lastSyncAt < THROTTLE_MS) return;
+      if (uiBusy()) return; // don't yank the UI while the user is in a sheet
+      syncing = true;
+      lastSyncAt = Date.now();
+      const before = snapshot();
       try {
         if (withMaster) await Sync.loadMasterIntoStore();
         await Sync.pullCurrentMonth();
-        window.dispatchEvent(new CustomEvent("expenses-synced"));
+        if (snapshot() !== before && !uiBusy()) {
+          window.dispatchEvent(new CustomEvent("expenses-synced"));
+        }
       } catch (e) { /* offline / expired session — leave local data alone */ }
+      finally { syncing = false; }
     }
+    window.syncFromSheets = syncFromSheets;
 
     // First load: if master is missing we MUST reload after pulling, because
     // categories.js has already captured an empty CATEGORIES object.
@@ -27,16 +55,14 @@
         .then(() => location.reload())
         .catch(() => {});
     } else {
-      syncFromSheets({ withMaster: false });
+      // Page load/refresh: full pull (master + current month)
+      syncFromSheets({ withMaster: true, force: true });
     }
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && Sync.loggedIn()) {
         syncFromSheets({ withMaster: false });
       }
-    });
-    window.addEventListener("focus", () => {
-      if (Sync.loggedIn()) syncFromSheets({ withMaster: false });
     });
     return;
   }

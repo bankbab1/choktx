@@ -115,5 +115,5 @@
   syncRangeBounds();
   render();
   window.onExpenseSaved = render;
-  window.addEventListener("expenses-synced", render);
+  window.addEventListener("expenses-synced", () => { if (!document.querySelector(".sheet-backdrop, .modal-backdrop")) render(); });
 })();
