@@ -47,29 +47,22 @@
     }
     window.syncFromSheets = syncFromSheets;
 
-    // First load: if master is missing, pull it once. Only reload if data
-    // ACTUALLY arrived (otherwise an empty sheet causes an endless reload
-    // loop that closes any open sheet/input). Guarded to once per session.
+    // First load only: if master cache is missing, pull it ONCE in the
+    // background so dropdowns work. No reload, no forced re-render.
+    // Subsequent operations never trigger auto-sync — user explicitly
+    // refreshes via pull-to-refresh or the Settings "Sync" button.
     if (needMaster && !sessionStorage.getItem("master_boot_attempted")) {
       sessionStorage.setItem("master_boot_attempted", "1");
       const before = snapshot();
       Sync.loadMasterIntoStore()
         .then(() => Sync.pullCurrentMonth().catch(() => {}))
         .then(() => {
-          // Reload only when new data came in AND the user isn't mid-input.
-          if (snapshot() !== before && !uiBusy()) location.reload();
+          if (snapshot() !== before && !uiBusy()) {
+            window.dispatchEvent(new CustomEvent("expenses-synced"));
+          }
         })
         .catch(() => {});
-    } else if (!needMaster) {
-      // Page load/refresh: full pull (master + current month)
-      syncFromSheets({ withMaster: true, force: true });
     }
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible" && Sync.loggedIn()) {
-        syncFromSheets({ withMaster: false });
-      }
-    });
     return;
   }
 
