@@ -3,6 +3,7 @@
   const emptyEl = document.getElementById("empty");
   const filterCat = document.getElementById("filter-cat");
   const filterPeriod = document.getElementById("filter-period");
+  const filterSearch = document.getElementById("filter-search");
   const rangeRow = document.getElementById("range-row");
   const rangeFrom = document.getElementById("range-from");
   const rangeTo = document.getElementById("range-to");
