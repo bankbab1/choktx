@@ -75,7 +75,8 @@
   function render() {
     const r = rangeFor(period);
     const pr = prevRangeFor(period);
-    const all = Store.all();
+    const isInvest = (c) => String(c || "").trim().toLowerCase() === "invest";
+    const all = Store.all().filter(x => includeInvest || !isInvest(x.category));
     const curr = all.filter(x => within(r, x.date));
     const prev = all.filter(x => within(pr, x.date));
 
