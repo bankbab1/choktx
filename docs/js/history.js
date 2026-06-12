@@ -4,6 +4,8 @@
   const filterCat = document.getElementById("filter-cat");
   const filterPeriod = document.getElementById("filter-period");
   const filterSearch = document.getElementById("filter-search");
+  const filterSearchClear = document.getElementById("filter-search-clear");
+  const resultCount = document.getElementById("result-count");
   const rangeRow = document.getElementById("range-row");
   const rangeFrom = document.getElementById("range-from");
   const rangeTo = document.getElementById("range-to");
