@@ -77,6 +77,15 @@
     });
     listEl.innerHTML = "";
     emptyEl.style.display = rows.length ? "none" : "block";
+    filterSearchClear.classList.toggle("show", !!filterSearch.value);
+    if (q) {
+      const total = rows.reduce((s, r) => s + Number(r.cost), 0);
+      resultCount.style.display = "inline-block";
+      resultCount.textContent = `${rows.length} match${rows.length === 1 ? "" : "es"} · ${fmt(total)}`;
+    } else {
+      resultCount.style.display = "none";
+    }
+
 
     const groups = {};
     rows.forEach(r => { (groups[r.date] = groups[r.date] || []).push(r); });
