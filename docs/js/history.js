@@ -116,6 +116,7 @@
     }
   }
   filterCat.addEventListener("change", render);
+  filterSearch.addEventListener("input", render);
   filterPeriod.addEventListener("change", render);
   rangeFrom.addEventListener("change", () => { syncRangeBounds(); render(); });
   rangeTo.addEventListener("change", () => { syncRangeBounds(); render(); });
