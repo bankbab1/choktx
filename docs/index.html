@@ -12,9 +12,14 @@
   <div class="app">
     <header class="app-header">
       <h1>Dashboard</h1>
-      <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
-        <i data-theme-icon data-lucide="moon"></i>
-      </button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+          <i data-theme-icon data-lucide="moon"></i>
+        </button>
+        <button class="icon-btn" id="header-logout-btn" aria-label="Logout" title="Logout" style="display:none">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
     </header>
 
     <main class="app-content">
